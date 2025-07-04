@@ -19,6 +19,7 @@ class Invoice extends Model
         'payment_status',
         'paid_at',
         'link_path',
+        'device_id',
     ];
 
     protected $casts = [
@@ -36,5 +37,10 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class);
     }
 }

@@ -19,8 +19,6 @@ class Device extends Model
         'model',
         'serial_number',
         'slug',
-        'description',
-        'status',
     ];
 
     protected $casts = [
@@ -35,5 +33,9 @@ class Device extends Model
     public function repairs(): HasMany
     {
         return $this->hasMany(Repair::class);
+    }
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 }

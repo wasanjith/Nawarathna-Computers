@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateSmsMessage extends CreateRecord
 {
     protected static string $resource = SmsMessageResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

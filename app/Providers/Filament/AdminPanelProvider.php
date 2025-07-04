@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+
+use App\Filament\Widgets\LatestRepairsWidget;
+use App\Filament\Widgets\RevenueWidget;
+use App\Filament\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,6 +31,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Nawarathna Computers')
+            ->brandLogo(asset('photos/logo.png'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('photos/favicon.ico'))
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -37,8 +45,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                StatsOverview::class,
+                LatestRepairsWidget::class,
+                RevenueWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

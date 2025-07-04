@@ -42,17 +42,6 @@ class DeviceResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'in_showroom' => 'In Showroom',
-                        'in_repair' => 'In Repair',
-                        'ready_for_pickup' => 'Ready for Pickup',
-                        'picked_up' => 'Picked Up',
-                    ])
-                    ->default('in_showroom')
-                    ->required(),
             ]);
     }
 
@@ -71,26 +60,12 @@ class DeviceResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('serial_number')
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'secondary' => 'in_showroom',
-                        'warning' => 'in_repair',
-                        'success' => 'ready_for_pickup',
-                        'primary' => 'picked_up',
-                    ]),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'in_showroom' => 'In Showroom',
-                        'in_repair' => 'In Repair',
-                        'ready_for_pickup' => 'Ready for Pickup',
-                        'picked_up' => 'Picked Up',
-                    ]),
-                Tables\Filters\TrashedFilter::make(),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
