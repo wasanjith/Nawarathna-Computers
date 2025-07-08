@@ -19,10 +19,12 @@ class Device extends Model
         'model',
         'serial_number',
         'slug',
+        'intheshowroom'
     ];
 
     protected $casts = [
-        'status' => 'string',
+        'status' => 'string'
+       
     ];
 
     public function customer(): BelongsTo

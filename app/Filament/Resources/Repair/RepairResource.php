@@ -44,11 +44,7 @@ class RepairResource extends Resource
                     ])
                     ->default('pending')
                     ->required(),
-                Forms\Components\TextInput::make('estimated_cost')
-                    ->numeric()
-                    ->prefix('Rs.'),
-                Forms\Components\DateTimePicker::make('estimated_completion_at'),
-                Forms\Components\DateTimePicker::make('completed_at'),
+                
                 Forms\Components\TextInput::make('warranty_months')
                     ->numeric()
                     ->default(0)
@@ -64,31 +60,21 @@ class RepairResource extends Resource
                 Tables\Columns\TextColumn::make('device.slug')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
+                
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'in_progress' => 'info',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'gray',
+                    })
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('problem_description')
                     ->limit(50)
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'secondary' => 'pending',
-                        'warning' => 'in_progress',
-                        'success' => 'completed',
-                        'danger' => 'cancelled',
-                    ]),
-                Tables\Columns\TextColumn::make('estimated_cost')
-                    ->money('LKR')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('estimated_completion_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('warranty_months')
-                    ->suffix(' months')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -101,6 +87,7 @@ class RepairResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -118,6 +105,7 @@ class RepairResource extends Resource
         return [
             'index' => Pages\ListRepairs::route('/'),
             'create' => Pages\CreateRepair::route('/create'),
+            'view' => Pages\ViewRepair::route('/{record}'),
             'edit' => Pages\EditRepair::route('/{record}/edit'),
         ];
     }

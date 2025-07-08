@@ -58,11 +58,19 @@ class DeviceResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('model')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('serial_number')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('intheshowroom')
+                    ->label('In the Showroom')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'yes' => 'success',
+                        'no' => 'danger',
+                    }),
+                //Register date column
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
+                    ->date()
+                    ->searchable(),
+                
+               
             ])
             ->filters([
                 //
