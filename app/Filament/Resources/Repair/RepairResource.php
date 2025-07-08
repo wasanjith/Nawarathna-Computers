@@ -60,7 +60,7 @@ class RepairResource extends Resource
                 Tables\Columns\TextColumn::make('device.slug')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -94,10 +94,15 @@ class RepairResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'in_progress' THEN 2 WHEN status = 'completed' THEN 3 WHEN status = 'cancelled' THEN 4 ELSE 5 END");
     }
 
     public static function getPages(): array
@@ -105,7 +110,6 @@ class RepairResource extends Resource
         return [
             'index' => Pages\ListRepairs::route('/'),
             'create' => Pages\CreateRepair::route('/create'),
-            'view' => Pages\ViewRepair::route('/{record}'),
             'edit' => Pages\EditRepair::route('/{record}/edit'),
         ];
     }
