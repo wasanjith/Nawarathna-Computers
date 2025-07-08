@@ -42,6 +42,11 @@ class DeviceResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Forms\Components\Select::make('intheshowroom')
+                    ->options([ 
+                        'yes' => 'Yes',
+                        'no' => 'No',
+                    ])
             ]);
     }
 
@@ -64,14 +69,21 @@ class DeviceResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'yes' => 'success',
                         'no' => 'danger',
-                    }),
+                    })
+                    ->sortable(),
                 //Register date column
                 Tables\Columns\TextColumn::make('created_at')
                     ->date()
-                    ->searchable(),
-                
-               
+                    ->sortable(),
+
+
             ])
+            ->defaultSort(function (\Illuminate\Database\Eloquent\Builder $query) {
+                return $query
+                    ->orderByRaw("CASE WHEN intheshowroom = 'yes' THEN 0 ELSE 1 END ASC")
+                    ->orderBy('created_at', 'asc');
+            })
+            
             ->filters([
                 //
             ])
@@ -82,8 +94,6 @@ class DeviceResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
