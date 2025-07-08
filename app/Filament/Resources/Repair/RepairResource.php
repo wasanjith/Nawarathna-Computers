@@ -89,6 +89,11 @@ class RepairResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('checklist')
+                ->label('Checklist')
+                ->icon('heroicon-o-eye')
+                ->url(fn(Repair $record): string => route('admin.repair.order', $record))
+                ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
