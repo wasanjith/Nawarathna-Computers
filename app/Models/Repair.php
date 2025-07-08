@@ -45,4 +45,9 @@ class Repair extends Model
     {
         return $this->hasOne(Invoice::class);
     }
+
+    public function checkList(): HasOne
+    {
+        return $this->hasOne(CheckList::class);
+    }
 }
