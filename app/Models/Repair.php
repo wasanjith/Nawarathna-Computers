@@ -31,6 +31,17 @@ class Repair extends Model
         'warranty_months' => 'integer',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::created(function ($repair) {
+            $repair->checkList()->create([
+                'repair_id' => $repair->id,
+            ]);
+        });
+    }
+
     public function device(): BelongsTo
     {
         return $this->belongsTo(Device::class);

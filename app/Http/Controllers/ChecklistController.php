@@ -21,7 +21,7 @@ class ChecklistController extends Controller
             return redirect()->route('checklist.edit', $checklist->id);
         }
 
-        return redirect()->route('filament.admin.resources.repair.RepairResource.php')->with('error', 'Checklist not found and creation from this endpoint is not supported.');
+        return redirect('/admin/repair/repairs')->with('error', 'Checklist not found and creation from this endpoint is not supported.');
     }
 
     /**
@@ -32,7 +32,7 @@ class ChecklistController extends Controller
         $validatedData = $this->getValidatedData($request);
         Checklist::create($validatedData);
 
-        return redirect()->route('filament.admin.resources.repairs.index')->with('success', 'Checklist created successfully.');
+        return redirect('/admin/repair/repairs')->with('success', 'Checklist created successfully.');
     }
 
     /**
@@ -51,7 +51,7 @@ class ChecklistController extends Controller
         $validatedData = $this->getValidatedData($request);
         $checklist->update($validatedData);
 
-        return redirect()->route('filament.admin.resources.repairs.index')->with('success', 'Checklist updated successfully.');
+        return redirect('/admin/repair/repairs')->with('success', 'Checklist updated successfully.');
     }
 
     private function getValidatedData(Request $request)
