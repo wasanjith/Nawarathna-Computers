@@ -24,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-600 text-sm font-light">
-                    @forelse ($callHistory as $call)
+                    @forelse ($callHistory->where('notes', '!=', 'Initial call record created automatically') as $call)
                         <tr class="border-b border-gray-200 hover:bg-gray-100">
                             <td class="py-3 px-6 text-left whitespace-nowrap">
                                 {{ $call->called_at->format('jS \of F Y') }} {{ $call->called_at->format('g.i A') }}
@@ -117,4 +117,5 @@
         </div>
     </div>
 </body>
+</html>
 </html>
