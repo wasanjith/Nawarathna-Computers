@@ -12,6 +12,7 @@ class CustomerCall extends Model
         'called_at',
         'status',
         'notes',
+        'device_id',
     ];
 
     protected $casts = [
@@ -21,6 +22,11 @@ class CustomerCall extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(Device::class);
     }
 
     public function getFormattedDurationAttribute(): string

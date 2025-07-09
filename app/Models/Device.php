@@ -27,6 +27,25 @@ class Device extends Model
        
     ];
 
+    public function getNameAttribute(): string
+    {
+        return "{$this->brand} {$this->model}";
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($device) {
+            $latestCall = CustomerCall::where('customer_id', $device->customer_id)
+                ->whereNull('device_id')
+                ->latest('called_at')
+                ->first();
+
+            if ($latestCall) {
+                $latestCall->update(['device_id' => $device->id]);
+            }
+        });
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -39,5 +58,10 @@ class Device extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function customerCalls(): HasMany
+    {
+        return $this->hasMany(CustomerCall::class);
     }
 }

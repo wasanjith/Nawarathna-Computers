@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerCallResource\Pages;
 use App\Models\CustomerCall;
-use App\Models\Customer;
+Use App\Models\Device;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -56,35 +56,30 @@ class CustomerCallResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.phone')
+                    ->label('Phone Number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('called_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'answered',
-                        'warning' => 'busy',
-                        'danger' => ['no_answer', 'switched_off'],
-                    ]),
-                Tables\Columns\TextColumn::make('notes')
-                    ->limit(50),
-            ])
-            ->defaultSort('called_at', 'desc')
-            ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'answered' => 'Answered',
-                        'no_answer' => 'No Answer',
-                        'busy' => 'Busy',
-                        'switched_off' => 'Switched Off',
-                    ]),
-                Tables\Filters\Filter::make('today')
-                    ->query(fn ($query) => $query->whereDate('called_at', today()))
-                    ->label('Today\'s Calls'),
+                Tables\Columns\TextColumn::make('device.name')
+                    ->label('Device Name')
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->orWhereHas('device', function ($q) use ($search) {
+                            $q->where('brand', 'like', "%{$search}%")
+                              ->orWhere('model', 'like', "%{$search}%");
+                        });
+                    })
+                    ->sortable(query: function ($query, string $direction) {
+                        return $query->orderBy(
+                            \App\Models\Device::select('brand')->whereColumn('devices.id', 'customer_calls.device_id'),
+                            $direction
+                        );
+                    })
+                    ->default('No Device'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('callhistory')
+                    ->label('Call History')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn(CustomerCall $record): string => route('customer.callhistory', ['customer' => $record->customer_id]))
+                    ->openUrlInNewTab(),
             ]);
     }
 
@@ -92,8 +87,9 @@ class CustomerCallResource extends Resource
     {
         return [
             'index' => Pages\ListCustomerCalls::route('/'),
-            'create' => Pages\CreateCustomerCall::route('/create'),
-            'edit' => Pages\EditCustomerCall::route('/{record}/edit'),
+            // 'create' => Pages\CreateCustomerCall::route('/create'),
+            // 'edit' => Pages\EditCustomerCall::route('/{record}/edit'),
         ];
     }
 }
+

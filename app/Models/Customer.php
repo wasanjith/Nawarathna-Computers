@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\CustomerCall;
 
 class Customer extends Model
 {
@@ -22,6 +23,19 @@ class Customer extends Model
         'whatsAppEnable' => 'string',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($customer) {
+            CustomerCall::create([
+                'customer_id' => $customer->id,
+                'device_id' => null,
+                'called_at' => now(),
+                'status' => 'no_answer',
+                'notes' => 'Initial call record created automatically',
+            ]);
+        });
+    }
+
     public function devices(): HasMany
     {
         return $this->hasMany(Device::class);
@@ -37,7 +51,7 @@ class Customer extends Model
         return $this->hasMany(SmsMessage::class);
     }
 
-     // Add this new relationship
+    // Add this new relationship
     public function calls(): HasMany
     {
         return $this->hasMany(CustomerCall::class);
@@ -46,5 +60,13 @@ class Customer extends Model
     public function getLastCallAttribute()
     {
         return $this->calls()->latest('called_at')->first();
+    }
+
+    /**
+     * Get all of the customerCalls for the Customer.
+     */
+    public function customerCalls(): HasMany
+    {
+        return $this->hasMany(CustomerCall::class);
     }
 }
