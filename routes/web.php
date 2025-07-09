@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\RepairController;
+use App\Http\Controllers\CustomerCallController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,5 @@ Route::get('customer/{customer}/callhistory', function (Customer $customer) {
     return view('CallHistory', compact('customer', 'callHistory'));
 })->name('customer.callhistory');
 Route::resource('checklist', ChecklistController::class)->except(['index', 'show', 'destroy', 'edit']);
+
+Route::post('/customers/{customer}/calls', [CustomerCallController::class, 'store'])->name('customers.calls.store');

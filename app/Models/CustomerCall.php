@@ -9,10 +9,10 @@ class CustomerCall extends Model
 {
     protected $fillable = [
         'customer_id',
+        'device_id',
         'called_at',
         'status',
         'notes',
-        'device_id',
     ];
 
     protected $casts = [
@@ -39,3 +39,4 @@ class CustomerCall extends Model
         return sprintf('%d:%02d', $minutes, $seconds);
     }
 }
+
