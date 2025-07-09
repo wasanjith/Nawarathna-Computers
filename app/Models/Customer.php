@@ -36,4 +36,15 @@ class Customer extends Model
     {
         return $this->hasMany(SmsMessage::class);
     }
+
+     // Add this new relationship
+    public function calls(): HasMany
+    {
+        return $this->hasMany(CustomerCall::class);
+    }
+
+    public function getLastCallAttribute()
+    {
+        return $this->calls()->latest('called_at')->first();
+    }
 }
