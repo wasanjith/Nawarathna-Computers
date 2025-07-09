@@ -73,6 +73,26 @@ class CustomerCallResource extends Resource
                         );
                     })
                     ->default('No Device'),
+                //device created at
+                Tables\Columns\TextColumn::make('device.created_at')
+                    ->label('Give Date')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('due_date')
+                    ->label('Due Date')
+                    ->getStateUsing(function (CustomerCall $record) {
+                        if ($record->device && $record->device->created_at) {
+                            $daysDiff = now()->startOfDay()->diffInDays($record->device->created_at->startOfDay());
+                            return $daysDiff . ' days';
+                        }
+                        return 'N/A';
+                    })
+                    ->sortable(query: function ($query, string $direction) {
+                        return $query->orderBy(
+                            \App\Models\Device::selectRaw('DATEDIFF(CURDATE(), DATE(created_at))')->whereColumn('devices.id', 'customer_calls.device_id'),
+                            $direction
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('callhistory')
