@@ -81,6 +81,43 @@ class RepairResource extends Resource
                 Tables\Columns\TextColumn::make('problem_description')
                     ->limit(50)
                     ->searchable(),
+
+                Tables\Columns\TextColumn::make('replaced_items')
+                    ->label('Replaced Items')
+                    ->html()
+                    ->getStateUsing(function (Repair $record) {
+                        $checklist = $record->checkList;
+                        if (!$checklist) {
+                            return '';
+                        }
+                        $fields = [
+                            'processor', 'motherboard', 'ram', 'hard_disk_1', 'hard_disk_2', 'optical_drive',
+                            'network', 'wifi', 'camera', 'hinges', 'laptopSPK', 'mic', 'touchPad', 'keyboard',
+                            'frontUSB', 'rearUSB', 'frontSound', 'rearSound', 'vgaPort', 'hdmiPort', 'hardHealth',
+                            'stressTest', 'benchMark', 'powerCable_1', 'powerCable_2', 'vgaCable', 'dviCable',
+                            'backpanelnuts'
+                        ];
+                        $replaced = [];
+                        foreach ($fields as $field) {
+                            if (isset($checklist->$field) && $checklist->$field === 'replaced') {
+                                $replaced[] = $field;
+                            }
+                        }
+                        if (empty($replaced)) {
+                            return '-';
+                        }
+                        $rows = [];
+                        for ($i = 0; $i < count($replaced); $i += 2) {
+                            $col1 = e(ucwords(str_replace(['_', 'SPK'], [' ', ' Speaker'], $replaced[$i])));
+                            $col2 = isset($replaced[$i + 1]) ? e(ucwords(str_replace(['_', 'SPK'], [' ', ' Speaker'], $replaced[$i + 1]))) : '';
+                            $rows[] = "<tr><td>{$col1}</td><td>{$col2}</td></tr>";
+                        }
+                        $table = '<table style="width:100%;border:none;">' . implode('', $rows) . '</table>';
+                        return '<details><summary style="cursor:pointer;">Show Replaced Items</summary>' . $table . '</details>';
+                    })
+                    ->sortable(false)
+                    ->searchable(false),
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
