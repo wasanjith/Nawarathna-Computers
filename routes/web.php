@@ -21,6 +21,6 @@ Route::get('customer/{customer}/callhistory', function (Customer $customer) {
     $callHistory = $customer->customerCalls()->with('device')->orderBy('called_at', 'desc')->get();
     return view('CallHistory', compact('customer', 'callHistory'));
 })->name('customer.callhistory');
-Route::resource('checklist', ChecklistController::class)->except(['index', 'show', 'destroy', 'edit']);
+Route::resource('checklist', ChecklistController::class)->except(['index', 'show', 'destroy']);
 
 Route::post('/customers/{customer}/calls', [CustomerCallController::class, 'store'])->name('customers.calls.store');

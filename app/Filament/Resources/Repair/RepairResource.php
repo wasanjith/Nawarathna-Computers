@@ -26,12 +26,22 @@ class RepairResource extends Resource
                     ->relationship('device', 'slug')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        if ($state) {
+                            $device = \App\Models\Device::find($state);
+                            if ($device && $device->customer_id) {
+                                $set('customer_id', $device->customer_id);
+                            }
+                        }
+                    }),
                 Forms\Components\Select::make('customer_id')
                     ->relationship('customer', 'name')
                     ->searchable()
                     ->preload()
                     ->required(),
+                    
                 Forms\Components\Textarea::make('problem_description')
                     ->required()
                     ->columnSpanFull(),
@@ -45,11 +55,7 @@ class RepairResource extends Resource
                     ->default('pending')
                     ->required(),
                 
-                Forms\Components\TextInput::make('warranty_months')
-                    ->numeric()
-                    ->default(0)
-                    ->minValue(0)
-                    ->maxValue(255),
+                
             ]);
     }
 
@@ -90,10 +96,11 @@ class RepairResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('checklist')
-                ->label('Checklist')
-                ->icon('heroicon-o-eye')
-                ->url(fn(Repair $record): string => route('checklist.edit', $record->checkList->id))
-                ->openUrlInNewTab(),
+                    ->label('Checklist')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn(Repair $record): string => route('checklist.edit', $record->checkList->id))
+                    ->openUrlInNewTab()
+                    ->visible(fn(Repair $record): bool => isset($record->checkList)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
