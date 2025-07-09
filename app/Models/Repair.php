@@ -21,6 +21,7 @@ class Repair extends Model
         'estimated_completion_at',
         'completed_at',
         'warranty_months',
+        'slug', // Assuming slug is a foreign key to the device
     ];
 
     protected $casts = [
@@ -61,4 +62,17 @@ class Repair extends Model
     {
         return $this->hasOne(CheckList::class);
     }
+    protected static function booted()
+    {
+        static::creating(function ($repair) {
+            if (empty($repair->slug) && !empty($repair->device_id)) {
+                $device = Device::find($repair->device_id);
+                if ($device) {
+                    $repair->slug = $device->slug;
+                }
+            }
+        });
+    }
+    
 }
+

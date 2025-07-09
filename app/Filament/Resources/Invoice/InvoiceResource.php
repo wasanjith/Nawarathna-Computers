@@ -23,7 +23,7 @@ class InvoiceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('repair_id')
-                    ->relationship('device', 'slug')
+                    ->relationship('repair', 'slug') // changed from 'device' to 'repair'
                     ->searchable()
                     ->preload()
                     ->required(),
