@@ -3,7 +3,7 @@
 namespace App\Providers\Filament;
 
 
-use App\Filament\Widgets\LatestRepairsWidget;
+// use App\Filament\Widgets\LatestRepairsWidget;
 use App\Filament\Widgets\RevenueWidget;
 use App\Filament\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;
@@ -46,8 +46,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 StatsOverview::class,
-                LatestRepairsWidget::class,
+                
                 RevenueWidget::class,
+                // LatestRepairsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
