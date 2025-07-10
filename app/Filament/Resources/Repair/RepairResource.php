@@ -117,6 +117,14 @@ class RepairResource extends Resource
                     })
                     ->sortable(false)
                     ->searchable(false),
+                Tables\Columns\SelectColumn::make('techniction_id')
+                    ->label('Technician')
+                    ->options(fn () => \App\Models\Techniction::pluck('name', 'id')->toArray())
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('Not Assigned')
+                    ->default(null)
+                    ->selectablePlaceholder('Select Technician'),
 
             ])
             ->filters([

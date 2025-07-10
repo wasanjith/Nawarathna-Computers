@@ -22,7 +22,8 @@ class Repair extends Model
         'estimated_completion_at',
         'completed_at',
         'warranty_months',
-        'slug', // Assuming slug is a foreign key to the device
+        'slug',
+        'techniction_id',// Assuming slug is a foreign key to the device
     ];
 
     protected $casts = [
@@ -79,6 +80,12 @@ class Repair extends Model
                 }
             }
         });
+    }
+
+    // relation to Techniction
+    public function techniction(): HasMany
+    {
+        return $this->hasMany(Techniction::class);
     }
     
 }
