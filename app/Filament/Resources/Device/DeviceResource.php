@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
+
 class DeviceResource extends Resource
 {
     protected static ?string $model = Device::class;
@@ -28,26 +29,76 @@ class DeviceResource extends Resource
                     ->relationship('customer', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        static::generateSlug($set, $get);
+                    }),
                 Forms\Components\TextInput::make('device_type')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        static::generateSlug($set, $get);
+                    }),
                 Forms\Components\TextInput::make('brand')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        static::generateSlug($set, $get);
+                    }),
                 Forms\Components\TextInput::make('model')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('serial_number')
-                    ->maxLength(255),
+                    ->maxLength(3)
+                    ->default(function () {
+                        // Get the last serial_number, increment, and pad to 3 digits
+                        $last = \App\Models\Device::orderByDesc('id')->first();
+                        $lastSerial = $last?->serial_number ?? '000';
+                        // Ensure we only consider the last 3 characters
+                        $lastSerial = substr($lastSerial, -3);
+                        $nextSerial = str_pad(((int)$lastSerial) + 1, 3, '0', STR_PAD_LEFT);
+                        return $nextSerial;
+                    })
+                    ->required()
+                    ->unique(ignoreRecord: true),
+                    
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                    
                 Forms\Components\Select::make('intheshowroom')
-                    ->options([ 
+                    ->options([
                         'yes' => 'Yes',
                         'no' => 'No',
                     ])
             ]);
+    }
+
+    private static function generateSlug(callable $set, callable $get)
+    {
+        $customerId = $get('customer_id');
+        $deviceType = $get('device_type');
+        $brand = $get('brand');
+
+        if ($customerId && $deviceType && $brand) {
+            // Get customer name
+            $customer = \App\Models\Customer::find($customerId);
+            $customerName = $customer?->name ?? '';
+
+            // Extract first name and add possessive
+            $firstName = explode(' ', trim($customerName))[0] ?? '';
+            $possessiveName = $firstName ? $firstName . "'s" : '';
+
+            // Get first 3 characters of device type
+            $deviceShort = substr($deviceType, 0, 3);
+
+            // Create slug: "John's MSI Lap"
+            $slug = trim($possessiveName . ' ' . $brand . ' ' . $deviceShort);
+
+            $set('slug', $slug);
+        }
     }
 
     public static function table(Table $table): Table
@@ -66,7 +117,7 @@ class DeviceResource extends Resource
                 Tables\Columns\TextColumn::make('intheshowroom')
                     ->label('In the Showroom')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'yes' => 'success',
                         'no' => 'danger',
                     })
@@ -83,7 +134,7 @@ class DeviceResource extends Resource
                     ->orderByRaw("CASE WHEN intheshowroom = 'yes' THEN 0 ELSE 1 END ASC")
                     ->orderBy('created_at', 'asc');
             })
-            
+
             ->filters([
                 //
             ])
