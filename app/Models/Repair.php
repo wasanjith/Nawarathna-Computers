@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -62,6 +63,12 @@ class Repair extends Model
     {
         return $this->hasOne(CheckList::class);
     }
+    
+    public function technictions(): HasMany
+    {
+        return $this->hasMany(Techniction::class);
+    }
+
     protected static function booted()
     {
         static::creating(function ($repair) {

@@ -33,10 +33,10 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName('Nawarathna Computers')
             ->brandLogo(asset('photos/logo.png'))
-            ->brandLogoHeight('2rem')
+            ->brandLogoHeight('4rem')
             ->favicon(asset('photos/favicon.ico'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#0d6efd',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
