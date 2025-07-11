@@ -29,12 +29,23 @@ class InvoiceResource extends Resource
                     ->required()
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $set) {
-                        // Fetch checklist replaced items for selected repair
                         $repair = \App\Models\Repair::find($state);
-                        $checklist = $repair?->checklist;
-                        if ($checklist && !empty($checklist->replaced_items)) {
-                            // Assume replaced_items is stored as JSON array in checklist
-                            $set('replaced_items', json_encode($checklist->replaced_items, JSON_PRETTY_PRINT));
+                        $checklist = $repair?->checkList;
+                        if ($checklist) {
+                            // List all relevant columns to check for 'replaced' status
+                            $fields = [
+                                'processor','motherboard','ram','hard_disk_1','hard_disk_2','optical_drive','network','wifi','camera',
+                                'hinges','laptopSPK','lapCamera','mic','touchPad','keyboard',
+                                'frontUSB','rearUSB','frontSound','rearSound','vgaPort','hdmiPort',
+                                'hardHealth','stressTest','benchMark','powerCable_1','powerCable_2','vgaCable','dviCable'
+                            ];
+                            $replaced = [];
+                            foreach ($fields as $field) {
+                                if ($checklist->$field === 'replaced') {
+                                    $replaced[] = $field;
+                                }
+                            }
+                            $set('replaced_items', !empty($replaced) ? json_encode($replaced, JSON_PRETTY_PRINT) : null);
                             $set('checklist_id', $checklist->id);
                         } else {
                             $set('replaced_items', null);
@@ -63,15 +74,22 @@ class InvoiceResource extends Resource
                     ->default('unpaid')
                     ->required(),
                 Forms\Components\Textarea::make('replaced_items')
-                    ->label('Replaced Items (JSON Array)')
+                    ->label('Replaced Items')
                     ->rows(3)
                     ->nullable()
-                    ->helperText('Automatically suggested from checklist, you can edit if needed.'),
-                // Forms\Components\Select::make('checklist_id')
-                //     ->relationship('checklist', 'id')
-                //     ->searchable()
-                //     ->preload()
-                //     ->nullable(),
+                    ->formatStateUsing(function ($state) {
+                        if (empty($state)) {
+                            return '';
+                        }
+                        $items = json_decode($state, true);
+                        if (is_array($items)) {
+                            // Show as bullet list
+                            return '• ' . implode("\n• ", $items);
+                        }
+                        return $state;
+                    })
+                   
+                    ->helperText('Automatically suggested from checklist, you can edit if needed. Enter one item per line.'),
             ]);
     }
 
@@ -82,13 +100,11 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('invoice_number')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('repair.customer.name')
-                    ->label('Customer')
-                    ->searchable()
-                    ->sortable(),
+                    // ->alignCenter(),
                 Tables\Columns\TextColumn::make('repair.device.slug')
                     ->label('Device')
                     ->searchable(),
+                    // ->alignCenter(),
                 Tables\Columns\TextColumn::make('total')
                     ->money('LKR')
                     ->sortable(),
@@ -97,16 +113,9 @@ class InvoiceResource extends Resource
                         'danger' => 'unpaid',
                         'warning' => 'partial',
                         'success' => 'paid',
-                    ]),
-                Tables\Columns\TextColumn::make('replaced_items')
-                    ->label('Replaced Items')
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('checklist_id')
-                    ->label('Checklist ID')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
+                    ])
+                    ->alignCenter(),
+                
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('payment_status')
