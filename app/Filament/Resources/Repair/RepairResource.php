@@ -67,15 +67,13 @@ class RepairResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'in_progress' => 'info',
-                        'completed' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'gray',
-                    })
+                Tables\Columns\SelectColumn::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'in_progress' => 'In Progress',
+                        'completed' => 'Completed',
+                        'cancelled' => 'Cancelled',
+                    ])
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('problem_description')

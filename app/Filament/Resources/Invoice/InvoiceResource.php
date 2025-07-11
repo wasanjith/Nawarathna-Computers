@@ -128,11 +128,11 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('total')
                     ->money('LKR')
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('payment_status')
-                    ->colors([
-                        'danger' => 'unpaid',
-                        'warning' => 'partial',
-                        'success' => 'paid',
+                Tables\Columns\SelectColumn::make('payment_status')
+                    ->options([
+                        'unpaid' => 'Unpaid',
+                        'partial' => 'Partial',
+                        'paid' => 'Paid',
                     ])
                     ->alignCenter(),
                 
