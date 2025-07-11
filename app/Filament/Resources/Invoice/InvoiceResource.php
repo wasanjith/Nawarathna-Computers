@@ -34,10 +34,34 @@ class InvoiceResource extends Resource
                         if ($checklist) {
                             // List all relevant columns to check for 'replaced' status
                             $fields = [
-                                'processor','motherboard','ram','hard_disk_1','hard_disk_2','optical_drive','network','wifi','camera',
-                                'hinges','laptopSPK','lapCamera','mic','touchPad','keyboard',
-                                'frontUSB','rearUSB','frontSound','rearSound','vgaPort','hdmiPort',
-                                'hardHealth','stressTest','benchMark','powerCable_1','powerCable_2','vgaCable','dviCable'
+                                'processor',
+                                'motherboard',
+                                'ram',
+                                'hard_disk_1',
+                                'hard_disk_2',
+                                'optical_drive',
+                                'network',
+                                'wifi',
+                                'camera',
+                                'hinges',
+                                'laptopSPK',
+                                'lapCamera',
+                                'mic',
+                                'touchPad',
+                                'keyboard',
+                                'frontUSB',
+                                'rearUSB',
+                                'frontSound',
+                                'rearSound',
+                                'vgaPort',
+                                'hdmiPort',
+                                'hardHealth',
+                                'stressTest',
+                                'benchMark',
+                                'powerCable_1',
+                                'powerCable_2',
+                                'vgaCable',
+                                'dviCable'
                             ];
                             $replaced = [];
                             foreach ($fields as $field) {
@@ -61,18 +85,7 @@ class InvoiceResource extends Resource
                         return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
                     })
                     ->unique(ignoreRecord: true),
-                Forms\Components\TextInput::make('total')
-                    ->required()
-                    ->numeric()
-                    ->prefix('Rs.'),
-                Forms\Components\Select::make('payment_status')
-                    ->options([
-                        'unpaid' => 'Unpaid',
-                        'partial' => 'Partial',
-                        'paid' => 'Paid',
-                    ])
-                    ->default('unpaid')
-                    ->required(),
+
                 Forms\Components\Textarea::make('replaced_items')
                     ->label('Replaced Items')
                     ->rows(3)
@@ -110,6 +123,18 @@ class InvoiceResource extends Resource
                         return !empty($items) ? json_encode($items, JSON_PRETTY_PRINT) : null;
                     })
                     ->helperText('Automatically suggested from checklist, you can edit if needed. Enter one item per line.'),
+                Forms\Components\TextInput::make('total')
+                    ->required()
+                    ->numeric()
+                    ->prefix('Rs.'),
+                Forms\Components\Select::make('payment_status')
+                    ->options([
+                        'unpaid' => 'Unpaid',
+                        'partial' => 'Partial',
+                        'paid' => 'Paid',
+                    ])
+                    ->default('unpaid')
+                    ->required(),
             ]);
     }
 
@@ -120,11 +145,11 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('invoice_number')
                     ->searchable()
                     ->sortable(),
-                    // ->alignCenter(),
+                // ->alignCenter(),
                 Tables\Columns\TextColumn::make('repair.device.slug')
                     ->label('Device')
                     ->searchable(),
-                    // ->alignCenter(),
+                // ->alignCenter(),
                 Tables\Columns\TextColumn::make('total')
                     ->money('LKR')
                     ->sortable(),
@@ -135,7 +160,7 @@ class InvoiceResource extends Resource
                         'paid' => 'Paid',
                     ])
                     ->alignCenter(),
-                
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('payment_status')
