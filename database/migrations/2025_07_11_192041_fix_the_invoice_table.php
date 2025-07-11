@@ -18,11 +18,7 @@ return new class extends Migration
             $table->dropColumn('link_path');
             // new columns replaced_items array
             $table->json('replaced_items')->nullable();
-            $table->unsignedBigInteger('checklist_id')->nullable();
-            $table->foreign('checklist_id')
-                ->references('id')
-                ->on('checklists')
-                ->onDelete('cascade');
+
         });
     }
 
@@ -38,8 +34,7 @@ return new class extends Migration
             $table->string('link_path')->nullable();
 
             // Drop the added columns and foreign key
-            $table->dropForeign(['checklist_id']);
-            $table->dropColumn('checklist_id');
+            
             $table->dropColumn('replaced_items');
         });
     }
