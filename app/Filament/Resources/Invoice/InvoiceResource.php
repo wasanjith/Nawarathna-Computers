@@ -81,14 +81,34 @@ class InvoiceResource extends Resource
                         if (empty($state)) {
                             return '';
                         }
+                        // If already an array, format as bullet list
+                        if (is_array($state)) {
+                            return '• ' . implode("\n• ", $state);
+                        }
+                        // If JSON string, decode and format as bullet list
                         $items = json_decode($state, true);
                         if (is_array($items)) {
-                            // Show as bullet list
                             return '• ' . implode("\n• ", $items);
                         }
+                        // Otherwise, return as is
                         return $state;
                     })
-                   
+                    ->dehydrateStateUsing(function ($state) {
+                        // Convert bullet list or plain text to JSON array for saving
+                        if (empty($state)) {
+                            return null;
+                        }
+                        // Remove bullets and split by lines
+                        $lines = preg_split('/\r\n|\r|\n/', $state);
+                        $items = [];
+                        foreach ($lines as $line) {
+                            $line = trim($line, "• \t\n\r\0\x0B");
+                            if ($line !== '') {
+                                $items[] = $line;
+                            }
+                        }
+                        return !empty($items) ? json_encode($items, JSON_PRETTY_PRINT) : null;
+                    })
                     ->helperText('Automatically suggested from checklist, you can edit if needed. Enter one item per line.'),
             ]);
     }
