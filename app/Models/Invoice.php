@@ -14,19 +14,18 @@ class Invoice extends Model
     protected $fillable = [
         'repair_id',
         'invoice_number',
-        'issued_at',
         'total',
         'payment_status',
-        'paid_at',
-        'link_path',
         'device_id',
+        'replaced_items',
+        'checklist_id',
     ];
 
     protected $casts = [
-        'issued_at' => 'datetime',
+        
         'total' => 'decimal:2',
         'payment_status' => 'string',
-        'paid_at' => 'datetime',
+        
     ];
 
     public function repair(): BelongsTo
@@ -42,5 +41,10 @@ class Invoice extends Model
     public function device(): BelongsTo
     {
         return $this->belongsTo(Device::class);
+    }
+    
+    public function checklist(): HasMany
+    {
+        return $this->hasMany(Checklist::class);
     }
 }

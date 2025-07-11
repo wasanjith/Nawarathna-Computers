@@ -23,16 +23,33 @@ class InvoiceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('repair_id')
-                    ->relationship('repair', 'slug') // changed from 'device' to 'repair'
+                    ->relationship('repair', 'slug')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        // Fetch checklist replaced items for selected repair
+                        $repair = \App\Models\Repair::find($state);
+                        $checklist = $repair?->checklist;
+                        if ($checklist && !empty($checklist->replaced_items)) {
+                            // Assume replaced_items is stored as JSON array in checklist
+                            $set('replaced_items', json_encode($checklist->replaced_items, JSON_PRETTY_PRINT));
+                            $set('checklist_id', $checklist->id);
+                        } else {
+                            $set('replaced_items', null);
+                            $set('checklist_id', null);
+                        }
+                    }),
                 Forms\Components\TextInput::make('invoice_number')
                     ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('issued_at')
-                    ->required(),
+                    ->maxLength(5)
+                    ->default(function () {
+                        $lastInvoice = \App\Models\Invoice::orderByDesc('id')->first();
+                        $nextNumber = $lastInvoice ? intval($lastInvoice->invoice_number) + 1 : 1;
+                        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+                    })
+                    ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('total')
                     ->required()
                     ->numeric()
@@ -45,9 +62,16 @@ class InvoiceResource extends Resource
                     ])
                     ->default('unpaid')
                     ->required(),
-                Forms\Components\DateTimePicker::make('paid_at'),
-                Forms\Components\TextInput::make('link_path')
-                    ->maxLength(255),
+                Forms\Components\Textarea::make('replaced_items')
+                    ->label('Replaced Items (JSON Array)')
+                    ->rows(3)
+                    ->nullable()
+                    ->helperText('Automatically suggested from checklist, you can edit if needed.'),
+                // Forms\Components\Select::make('checklist_id')
+                //     ->relationship('checklist', 'id')
+                //     ->searchable()
+                //     ->preload()
+                //     ->nullable(),
             ]);
     }
 
@@ -65,9 +89,6 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('repair.device.slug')
                     ->label('Device')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('issued_at')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('total')
                     ->money('LKR')
                     ->sortable(),
@@ -77,8 +98,11 @@ class InvoiceResource extends Resource
                         'warning' => 'partial',
                         'success' => 'paid',
                     ]),
-                Tables\Columns\TextColumn::make('paid_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('replaced_items')
+                    ->label('Replaced Items')
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('checklist_id')
+                    ->label('Checklist ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

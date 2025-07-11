@@ -44,4 +44,10 @@ class CheckList extends Model
     {
         return $this->belongsTo(Repair::class);
     }
+
+    //belongs to invoice
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
+    }
 }
