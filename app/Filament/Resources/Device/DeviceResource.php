@@ -31,6 +31,7 @@ class DeviceResource extends Resource
                     ->preload()
                     ->required()
                     ->live()
+                    ->default(fn () => request()->get('customer_id')) // <-- Add this line
                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         static::generateSlug($set, $get);
                     }),

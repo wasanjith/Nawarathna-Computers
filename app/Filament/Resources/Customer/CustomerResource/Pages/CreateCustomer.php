@@ -13,4 +13,11 @@ class CreateCustomer extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function afterCreate(): void
+    {
+        $customerId = $this->record->id;
+        // Use Filament's resource URL generator for DeviceResource
+        $this->redirect(\App\Filament\Resources\Device\DeviceResource::getUrl('create', ['customer_id' => $customerId]));
+    }
 }

@@ -24,3 +24,7 @@ Route::get('customer/{customer}/callhistory', function (Customer $customer) {
 Route::resource('checklist', ChecklistController::class)->except(['index', 'show', 'destroy']);
 
 Route::post('/customers/{customer}/calls', [CustomerCallController::class, 'store'])->name('customers.calls.store');
+
+Route::get('/checklist', function () {
+    return view('cheking');
+});
