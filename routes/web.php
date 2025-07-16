@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\RepairController;
+use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\CustomerCallController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('cheking');
 });
 Route::get('/admin/repairs/{repair}/order', function (App\Models\Repair $repair) {
     return view('Checklist', compact('repair'));
@@ -28,3 +29,10 @@ Route::post('/customers/{customer}/calls', [CustomerCallController::class, 'stor
 Route::get('/checklist', function () {
     return view('cheking');
 });
+
+// Checklist save route
+Route::post('/checklist/save', [App\Http\Controllers\ChecklistController::class, 'store'])->name('checklist.save');
+
+// API endpoints for auto-suggest
+Route::get('/api/repairs/ids', [RepairController::class, 'getRepairIds']);
+Route::get('/api/devices/ids', [DeviceController::class, 'getDeviceIds']);

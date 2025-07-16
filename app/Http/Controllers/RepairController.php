@@ -102,4 +102,13 @@ class RepairController extends Controller
         // $repair->delete();
         // return redirect()->route('admin.repairs.index');
     }
+
+    // API endpoint for auto-suggesting repair IDs
+    public function getRepairIds(Request $request)
+    {
+        $term = $request->input('term');
+        $repairs = \App\Models\Repair::where('id', 'like', "%$term%")
+            ->pluck('id');
+        return response()->json($repairs);
+    }
 }

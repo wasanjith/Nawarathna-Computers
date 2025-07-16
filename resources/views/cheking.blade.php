@@ -67,34 +67,68 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
+    <!-- Toast Message -->
+    @if(session('success'))
+        <div id="toast-message" class="fixed top-6 right-6 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+        <script>
+            setTimeout(function() {
+                var toast = document.getElementById('toast-message');
+                if (toast) toast.style.display = 'none';
+            }, 3500);
+        </script>
+    @endif
+    <!-- Admin Button -->
+    <div class="w-full flex justify-end mb-4">
+        <a href="/admin" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
+            <i class="fas fa-user-shield mr-2"></i>Admin
+        </a>
+    </div>
     <div class="max-w-7xl mx-auto p-6">
-        {{-- method="POST" action="{{ route('repair.store') }}" --}}
-        <form >
-            @csrf
-            
-            <!-- Header Section -->
-            <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-2xl shadow-2xl mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="date" class="block text-sm font-medium mb-2">Date</label>
-                        <input type="date" class="w-full px-4 py-3 rounded-lg border-0 text-gray-900 shadow-md focus:ring-2 focus:ring-white focus:outline-none" id="date" name="date" value="{{ date('Y-m-d') }}" required>
-                    </div>
-                    <div>
-                        <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border-0 text-gray-900 shadow-md focus:ring-2 focus:ring-white focus:outline-none" id="repair_id" name="repair_id" placeholder="Enter Repair ID" required>
-                    </div>
-                    <div>
-                        <label for="device_id" class="block text-sm font-medium mb-2">Device ID</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border-0 text-gray-900 shadow-md focus:ring-2 focus:ring-white focus:outline-none" id="device_id" name="device_id" placeholder="Enter Device ID" required>
+        <!-- Invoice-style Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-2xl shadow-2xl p-6 mb-6 border-b-4 border-blue-200">
+            <div class="flex items-center gap-6">
+                <img src="/photos/logo.png" alt="Company Logo" class="w-32 h-auto">
+                <div>
+                    <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Nawarathna Computer</h1>
+                    <div class="text-base text-gray-700">
+                        <div><strong>Address:</strong> No 339, Colombo Road, Pilimathalawa</div>
+                        <div><strong>Contact:</strong> 081-2577370, 0777-977070, 0777-535121</div>
+                        <div><strong>Website:</strong> www.nccs.lk</div>
+                        <div><strong>Email:</strong> thenccs@gmail.com</div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Separated Input Fields Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
+            <div class="flex-1">
+                <label for="date" class="block text-sm font-medium mb-2">Date</label>
+                <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" value="{{ date('Y-m-d') }}" required>
+            </div>
+            <div class="flex-1">
+                <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
+                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="repair_id" name="repair_id" placeholder="Enter Repair ID" required list="repair_ids">
+                <datalist id="repair_ids"></datalist>
+            </div>
+            <div class="flex-1">
+                <label for="device_id" class="block text-sm font-medium mb-2">Device ID</label>
+                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="device_id" name="device_id" placeholder="Enter Device ID" required list="device_ids">
+                <datalist id="device_ids"></datalist>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('checklist.save') }}">
+            @csrf
+            
             <!-- Modern Checklist Section -->
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
-                <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-6">
+                <div class="text-gray-900 text-center py-6 bg-white">
                     <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
-                    <p class="text-purple-100 mt-2">Select the status for each component</p>
+                    <p class="text-purple-700 mt-2">Select the status for each component</p>
                 </div>
                 
                 <div class="p-6">
@@ -151,7 +185,9 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach($statusConfig as $status => $config)
                                 <button type="button" 
-                                        class="status-btn {{ $config['color'] }} text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all duration-300 opacity-70 hover:opacity-100"
+                                        class="status-btn bg-white border-2 border-blue-500 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all duration-300 opacity-70 hover:opacity-100"
+                                        data-color="{{ $config['color'] }}"
+                                        data-status="{{ $status }}"
                                         onclick="selectStatus({{ $index }}, '{{ $status }}', this)">
                                     <i class="{{ $config['icon'] }} text-xs"></i>
                                     <span>{{ $config['text'] }}</span>
@@ -193,7 +229,7 @@
                         <label for="whatsapp_enabled" class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Enabled</label>
                         <div class="flex items-center mt-3">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="1">
+                                <input type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="1" checked>
                                 <span class="slider"></span>
                             </label>
                             <span class="ml-3 text-sm text-gray-600">Enable WhatsApp notifications</span>
@@ -210,9 +246,9 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div>
-                        <label for="device_customer_name" class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
-                               id="device_customer_name" name="device_customer_name" placeholder="Enter customer name" required onchange="generateSlug()">
+                        <label for="device_type" class="block text-sm font-medium text-gray-700 mb-2">Device Type</label>
+                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                               id="device_type" name="device_type" placeholder="(e.g., Laptop, Desktop)" required>
                     </div>
                     <div>
                         <label for="device_brand" class="block text-sm font-medium text-gray-700 mb-2">Brand</label>
@@ -225,18 +261,34 @@
                                id="device_model" name="device_model" placeholder="Enter model (e.g., Laptop)" required onchange="generateSlug()">
                     </div>
                     <div>
-                        <label for="device_device_id" class="block text-sm font-medium text-gray-700 mb-2">Device ID</label>
+                        <label for="problem_description" class="block text-sm font-medium text-gray-700 mb-2">Problem Ddescription</label>
                         <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
-                               id="device_device_id" name="device_device_id" placeholder="Enter device ID" required>
+                               id="problem_description" name="problem_description" placeholder="Problem" required>
+                    </div>
+                    
+                </div>
+                <div class="mt-6 flex flex-col md:flex-row md:space-x-6">
+                    <div class="flex-1">
+                        <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800 font-medium" id="slug_display">
+                            Slug will be auto-generated when you fill in the details...
+                        </div>
+                        <input type="hidden" id="slug" name="slug" value="">
+                    </div>
+                    <div class="flex-1 mt-6 md:mt-0">
+                        <label for="technician_id" class="block text-sm font-medium text-gray-700 mb-2">Assign Technician</label>
+                        <select id="technician_id" name="technician_id" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" required>
+                            <option value="">Select a technician</option>
+                            @php
+                                $technicians = \DB::table('technictions')->orderBy('name')->get();
+                            @endphp
+                            @foreach($technicians as $technician)
+                                <option value="{{ $technician->id }}">{{ $technician->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800 font-medium" id="slug_display">
-                        Slug will be auto-generated when you fill in the details...
-                    </div>
-                    <input type="hidden" id="slug" name="slug" value="">
-                </div>
+                
             </div>
 
             <!-- Submit Button -->
@@ -248,56 +300,7 @@
         </form>
 
         <!-- Company Information -->
-        <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-2xl text-center mt-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                    <strong>Contact:</strong> 081-2577370, 0777-977070, 0777-535121
-                </div>
-                <div>
-                    <strong>Address:</strong> No 339, Colombo Road, Pilimathalawa
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-2">
-                <div>
-                    <strong>Website:</strong> www.nccs.lk
-                </div>
-                <div>
-                    <strong>Email:</strong> thenccs@gmail.com
-                </div>
-            </div>
-        </div>
-    </div> name="slug" value="">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" class="btn create-btn">
-                    <i class="fas fa-tools"></i> Create Repair
-                </button>
-            </div>
-        </form>
-
-        <!-- Company Information -->
-        <div class="company-info">
-            <div class="row">
-                <div class="col-md-6">
-                    <strong>Contact:</strong> 081-2577370, 0777-977070, 0777-535121
-                </div>
-                <div class="col-md-6">
-                    <strong>Address:</strong> No 339, Colombo Road, Pilimathalawa
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-md-6">
-                    <strong>Website:</strong> www.nccs.lk
-                </div>
-                <div class="col-md-6">
-                    <strong>Email:</strong> thenccs@gmail.com
-                </div>
-            </div>
-        </div>
+        <!-- Removed duplicate footer/company info as it's now in the header -->
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -315,19 +318,16 @@
 
         // Generate slug automatically
         function generateSlug() {
-            const customerName = document.getElementById('device_customer_name').value;
+            const customerName = document.getElementById('customer_name').value;
             const brand = document.getElementById('device_brand').value;
-            const model = document.getElementById('device_model').value;
+            const deviceType = document.getElementById('device_type').value;
             
-            if (customerName && brand && model) {
+            if (customerName && brand && deviceType) {
                 // Get first name only
                 const firstName = customerName.split(' ')[0];
                 
-                // Get first 3 letters of model
-                const modelShort = model.substring(0, 3);
-                
-                // Create slug: "FirstName's Brand ModelShort"
-                const slug = `${firstName}'s ${brand} ${modelShort}`;
+                // Create slug: "FirstName's Brand DeviceType"
+                const slug = `${firstName}'s ${brand} ${deviceType}`;
                 
                 document.getElementById('slug').value = slug;
                 document.getElementById('slug_display').textContent = slug;
@@ -336,16 +336,65 @@
             }
         }
 
-        // Sync customer name between sections
-        document.getElementById('customer_name').addEventListener('input', function() {
-            document.getElementById('device_customer_name').value = this.value;
-            generateSlug();
+        // Auto-suggest for Repair ID
+        document.getElementById('repair_id').addEventListener('input', function() {
+            fetch('/api/repairs/ids?term=' + this.value)
+                .then(response => response.json())
+                .then(data => {
+                    let datalist = document.getElementById('repair_ids');
+                    datalist.innerHTML = '';
+                    data.forEach(id => {
+                        let option = document.createElement('option');
+                        option.value = id;
+                        datalist.appendChild(option);
+                    });
+                });
+        });
+        // Auto-suggest for Device ID
+        document.getElementById('device_id').addEventListener('input', function() {
+            fetch('/api/devices/ids?term=' + this.value)
+                .then(response => response.json())
+                .then(data => {
+                    let datalist = document.getElementById('device_ids');
+                    datalist.innerHTML = '';
+                    data.forEach(id => {
+                        let option = document.createElement('option');
+                        option.value = id;
+                        datalist.appendChild(option);
+                    });
+                });
         });
 
-        document.getElementById('device_customer_name').addEventListener('input', function() {
-            document.getElementById('customer_name').value = this.value;
-            generateSlug();
-        });
+        // Add selectStatus function for checklist buttons
+        function selectStatus(index, status, btn) {
+            // Set the hidden input value
+            document.getElementById('status_' + index).value = status;
+
+            // Remove 'active' and color classes from all buttons in this group
+            var parent = btn.parentElement;
+            Array.from(parent.children).forEach(function(child) {
+                child.classList.remove('active');
+                child.classList.add('opacity-70');
+                // Remove any bg-* and hover:bg-* classes
+                child.className = child.className.replace(/bg-(gray|green|blue|red|purple)-[0-9]+(\s|$)/g, 'bg-white ');
+                child.className = child.className.replace(/hover:bg-(gray|green|blue|red|purple)-[0-9]+(\s|$)/g, '');
+                child.classList.remove('text-white');
+                child.classList.add('text-blue-700');
+            });
+
+            // Add 'active' and color class to the clicked button
+            btn.classList.add('active');
+            btn.classList.remove('opacity-70');
+            var colorClass = btn.getAttribute('data-color');
+            if (colorClass) {
+                colorClass.split(' ').forEach(function(cls) {
+                    btn.classList.add(cls);
+                });
+                btn.classList.remove('bg-white');
+                btn.classList.remove('text-blue-700');
+                btn.classList.add('text-white');
+            }
+        }
     </script>
 </body>
 </html>

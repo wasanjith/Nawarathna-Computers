@@ -29,10 +29,54 @@ class ChecklistController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $this->getValidatedData($request);
-        Checklist::create($validatedData);
+        // Validate and extract data
+        $data = $request->all();
 
-        return redirect('/admin/repair/repairs')->with('success', 'Checklist created successfully.');
+        // 1. Create or update Customer
+        $customer = \App\Models\Customer::firstOrCreate(
+            [
+                'phone' => $data['customer_phone'],
+            ],
+            [
+                'name' => $data['customer_name'],
+                'city' => $data['customer_city'],
+                'whatsAppEnable' => $request->has('whatsapp_enabled') ? '1' : '0',
+            ]
+        );
+
+        // 2. Create Device
+        $device = \App\Models\Device::firstOrCreate(
+            [
+                'slug' => $data['slug'] ?? null,
+                'customer_id' => $customer->id,
+            ],
+            [
+                'device_type' => $data['device_type'],
+                'brand' => $data['device_brand'],
+                'model' => $data['device_model'],
+            ]
+        );
+
+        // 3. Create Repair
+        $repair = \App\Models\Repair::create([
+            'device_id' => $device->id,
+            'customer_id' => $customer->id,
+            'slug' => $data['slug'] ?? null,
+            // Add more fields as needed
+        ]);
+
+        // 4. Create Checklist (store all checklist items)
+        if (isset($data['checklist']) && is_array($data['checklist'])) {
+            foreach ($data['checklist'] as $item) {
+                \App\Models\CheckList::create([
+                    'repair_id' => $repair->id,
+                    'component' => $item['component'] ?? null,
+                    'status' => $item['status'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect('/')->with('success', 'Repair is saved!');
     }
 
     /**

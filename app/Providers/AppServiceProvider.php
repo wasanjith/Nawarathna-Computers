@@ -23,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Filament::serving(function () {
             Filament::registerNavigationGroups([
+
+                NavigationGroup::make()
+                    ->label('Repair Management'),
+                    
                 NavigationGroup::make()
                     ->label('Customer Management'),
 
@@ -30,8 +34,7 @@ class AppServiceProvider extends ServiceProvider
                 NavigationGroup::make()
                     ->label('Device Management'),
 
-                NavigationGroup::make()
-                    ->label('Repair Management'),
+                
 
 
                 NavigationGroup::make()
