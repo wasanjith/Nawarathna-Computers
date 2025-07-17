@@ -50,19 +50,6 @@ class DeviceResource extends Resource
                     }),
                 Forms\Components\TextInput::make('model')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('serial_number')
-                    ->maxLength(3)
-                    ->default(function () {
-                        // Get the last serial_number, increment, and pad to 3 digits
-                        $last = \App\Models\Device::orderByDesc('id')->first();
-                        $lastSerial = $last?->serial_number ?? '000';
-                        // Ensure we only consider the last 3 characters
-                        $lastSerial = substr($lastSerial, -3);
-                        $nextSerial = str_pad(((int)$lastSerial) + 1, 3, '0', STR_PAD_LEFT);
-                        return $nextSerial;
-                    })
-                    ->required()
-                    ->unique(ignoreRecord: true),
                     
                 Forms\Components\TextInput::make('slug')
                     ->required()
