@@ -96,19 +96,30 @@
     <div class="max-w-7xl mx-auto p-6">
         <!-- Invoice-style Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-2xl shadow-2xl p-6 mb-6 border-b-4 border-blue-200">
-            <div class="flex items-center gap-6">
-                <img src="/photos/logo.png" alt="Company Logo" class="w-32 h-auto">
-                <div>
-                    <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Nawarathna Computer</h1>
-                    <div class="text-base text-gray-700">
-                        <div><strong>Address:</strong> No 339, Colombo Road, Pilimathalawa</div>
-                        <div><strong>Contact:</strong> 081-2577370, 0777-977070, 0777-535121</div>
-                        <div><strong>Website:</strong> www.nccs.lk</div>
-                        <div><strong>Email:</strong> thenccs@gmail.com</div>
+            <div class="flex flex-row items-center w-full md:w-auto gap-8">
+                <!-- Logo and website -->
+                <div class="flex flex-col items-center mr-6">
+                    <img src="/photos/logo.png" alt="Company Logo" class="w-20 h-20 object-contain mb-1">
+                    <span class="text-xs text-gray-600 mt-1">www.nccs.lk</span>
+                </div>
+                <!-- Company Info -->
+                <div class="flex flex-col justify-center">
+                    <div class="text-3xl md:text-5xl font-extrabold tracking-widest text-gray-900 leading-none" style="letter-spacing:0.4em;">
+                        NAWARATHNA
+                    </div>
+                    <div class="text-2xl md:text-3xl font-light text-gray-800 leading-tight -mt-1 mb-2">
+                        Cellular & Computer Systems
+                    </div>
+                    <div class="text-base text-gray-700 font-normal">
+                        <span>No 339, Colombo Road, Pilimathalawa. </span>
+                        <span class="font-semibold">thenccs@gmail.com</span>
+                    </div>
+                    <div class="text-base text-gray-700 font-normal">
+                        081-2577370, 0777-977070, 0777-535121
                     </div>
                 </div>
             </div>
-            <div class="mt-4 md:mt-0 flex justify-end">
+            <div class="mt-4 md:mt-0 flex justify-end w-full md:w-auto">
                 <a href="/admin" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-user-shield mr-2"></i>Admin
                 </a>
@@ -221,7 +232,6 @@
                                 ['name' => 'DVI Cable', 'icon' => 'fas fa-plug'],
                                 ['name' => 'Hinges', 'icon' => 'fas fa-laptop'],
                                 ['name' => 'Laptop Speakers', 'icon' => 'fas fa-volume-up'],
-                                ['name' => 'Camera', 'icon' => 'fas fa-camera'],
                                 ['name' => 'Microphone', 'icon' => 'fas fa-microphone'],
                                 ['name' => 'TouchPad', 'icon' => 'fas fa-hand-pointer'],
                                 ['name' => 'Keyboard', 'icon' => 'fas fa-keyboard'],
@@ -352,7 +362,7 @@
                                id="device_model" name="device_model" placeholder="Enter model (e.g., Laptop)" required onchange="generateSlug()">
                     </div>
                     <div>
-                        <label for="problem_description" class="block text-sm font-medium text-gray-700 mb-2">Problem Ddescription</label>
+                        <label for="problem_description" class="block text-sm font-medium text-gray-700 mb-2">Problem Description</label>
                         <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
                                id="problem_description" name="problem_description" placeholder="Problem" required>
                     </div>
@@ -374,7 +384,7 @@
                     <div class="flex-1">
                         <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800 font-medium" id="slug_display">
-                            Slug will be auto-generated..
+                            Slug will be auto-generated.
                         </div>
                         <input type="hidden" id="slug" name="slug" value="">
                     </div>
@@ -406,7 +416,6 @@
         <!-- Removed duplicate footer/company info as it's now in the header -->
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Load next repair ID when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -447,17 +456,6 @@
                 });
         }
 
-        // Handle checkbox changes (only one can be selected per row)
-        function handleCheckboxChange(rowIndex, selectedStatus) {
-            const statuses = ['not_tested', 'working', 'replaced', 'removed', 'installed'];
-            
-            statuses.forEach(status => {
-                if (status !== selectedStatus) {
-                    document.getElementById(`checklist_${rowIndex}_${status}`).checked = false;
-                }
-            });
-        }
-
         // Generate slug automatically
         function generateSlug() {
             const customerName = document.getElementById('customer_name').value;
@@ -474,7 +472,7 @@
                 document.getElementById('slug').value = slug;
                 document.getElementById('slug_display').textContent = slug;
             } else {
-                document.getElementById('slug_display').textContent = 'Slug will be auto-generated...';
+                document.getElementById('slug_display').textContent = 'Slug will be auto-generated.';
             }
         }
 
