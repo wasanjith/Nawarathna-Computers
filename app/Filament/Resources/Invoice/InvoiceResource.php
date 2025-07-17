@@ -28,40 +28,15 @@ class InvoiceResource extends Resource
                     ->preload()
                     ->required()
                     ->reactive()
-                    ->afterStateUpdated(function ($state, callable $set) {
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
                         $repair = \App\Models\Repair::find($state);
                         $checklist = $repair?->checkList;
                         if ($checklist) {
-                            // List all relevant columns to check for 'replaced' status
                             $fields = [
-                                'processor',
-                                'motherboard',
-                                'ram',
-                                'hard_disk_1',
-                                'hard_disk_2',
-                                'optical_drive',
-                                'network',
-                                'wifi',
-                                'camera',
-                                'hinges',
-                                'laptopSPK',
-                                'lapCamera',
-                                'mic',
-                                'touchPad',
-                                'keyboard',
-                                'frontUSB',
-                                'rearUSB',
-                                'frontSound',
-                                'rearSound',
-                                'vgaPort',
-                                'hdmiPort',
-                                'hardHealth',
-                                'stressTest',
-                                'benchMark',
-                                'powerCable_1',
-                                'powerCable_2',
-                                'vgaCable',
-                                'dviCable'
+                                'processor', 'motherboard', 'ram', 'hard_disk_1', 'hard_disk_2', 'optical_drive',
+                                'network', 'wifi', 'camera', 'hinges', 'laptopSPK', 'lapCamera', 'mic', 'touchPad',
+                                'keyboard', 'frontUSB', 'rearUSB', 'frontSound', 'rearSound', 'vgaPort', 'hdmiPort',
+                                'hardHealth', 'stressTest', 'benchMark', 'powerCable_1', 'powerCable_2', 'vgaCable', 'dviCable'
                             ];
                             $replaced = [];
                             foreach ($fields as $field) {
@@ -69,10 +44,19 @@ class InvoiceResource extends Resource
                                     $replaced[] = $field;
                                 }
                             }
-                            $set('replaced_items', !empty($replaced) ? json_encode($replaced, JSON_PRETTY_PRINT) : null);
+                            // Pre-fill the repeater
+                            $rows = [];
+                            foreach ($replaced as $item) {
+                                $rows[] = [
+                                    'item' => $item,
+                                    'brand' => '',
+                                    'price' => '',
+                                ];
+                            }
+                            $set('replaced_items_table', $rows);
                             $set('checklist_id', $checklist->id);
                         } else {
-                            $set('replaced_items', null);
+                            $set('replaced_items_table', []);
                             $set('checklist_id', null);
                         }
                     }),
@@ -86,48 +70,80 @@ class InvoiceResource extends Resource
                     })
                     ->unique(ignoreRecord: true),
 
-                Forms\Components\Textarea::make('replaced_items')
-                    ->label('Replaced Items')
-                    ->rows(3)
-                    ->nullable()
-                    ->formatStateUsing(function ($state) {
-                        if (empty($state)) {
-                            return '';
+                Forms\Components\Repeater::make('replaced_items_table')
+                    ->label('Replaced Items Table')
+                    ->schema([
+                        Forms\Components\TextInput::make('item')
+                            ->label('Replaced Item')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('brand')
+                            ->label('Brand')
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('price')
+                            ->label('Price')
+                            ->numeric()
+                            ->prefix('Rs.')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                // When a price is updated, recalculate total
+                                $rows = $get('../../replaced_items_table') ?? [];
+                                $total = 0;
+                                foreach ($rows as $row) {
+                                    $total += floatval($row['price'] ?? 0);
+                                }
+                                $set('../../total', $total);
+                            }),
+                    ])
+                    ->grid(3)
+                    ->columnSpanFull()
+                    ->required(false)
+                    ->afterStateHydrated(function ($component, $state, $record, $set) {
+                        // On edit, hydrate from the three columns if present
+                        if ($record) {
+                            $items = $record->replaced_items ?? [];
+                            $brands = $record->replaced_items_brand ?? [];
+                            $prices = $record->replaced_items_prices ?? [];
+                            $rows = [];
+                            foreach ($items as $i => $item) {
+                                $rows[] = [
+                                    'item' => $item,
+                                    'brand' => $brands[$i] ?? '',
+                                    'price' => $prices[$i] ?? '',
+                                ];
+                            }
+                            $set('replaced_items_table', $rows);
                         }
-                        // If already an array, format as bullet list
-                        if (is_array($state)) {
-                            return '• ' . implode("\n• ", $state);
-                        }
-                        // If JSON string, decode and format as bullet list
-                        $items = json_decode($state, true);
-                        if (is_array($items)) {
-                            return '• ' . implode("\n• ", $items);
-                        }
-                        // Otherwise, return as is
-                        return $state;
                     })
                     ->dehydrateStateUsing(function ($state) {
-                        // Convert bullet list or plain text to JSON array for saving
-                        if (empty($state)) {
-                            return null;
-                        }
-                        // Remove bullets and split by lines
-                        $lines = preg_split('/\r\n|\r|\n/', $state);
-                        $items = [];
-                        foreach ($lines as $line) {
-                            $line = trim($line, "• \t\n\r\0\x0B");
-                            if ($line !== '') {
-                                $items[] = $line;
-                            }
-                        }
-                        return !empty($items) ? json_encode($items, JSON_PRETTY_PRINT) : null;
+                        // Only return the state, do not try to set other fields here
+                        return $state;
                     })
-                    ->helperText('Automatically suggested from checklist, you can edit if needed. Enter one item per line.'),
-                Forms\Components\TextInput::make('total')
-                    ->required()
+                    ->reactive(),
+
+                Forms\Components\Hidden::make('replaced_items')
+                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('item')->toArray()),
+                Forms\Components\Hidden::make('replaced_items_brand')
+                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('brand')->toArray()),
+                Forms\Components\Hidden::make('replaced_items_prices')
+                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('price')->toArray()),
+                Forms\Components\TextInput::make('repair_cost')
+                    ->label('Repair Cost')
                     ->numeric()
-                    ->prefix('Rs.'),
-                Forms\Components\Select::make('payment_status')
+                    ->prefix('Rs.')
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        // When repair_cost changes, update total
+                        $rows = $get('replaced_items_table') ?? [];
+                        $repairCost = floatval($state ?? 0);
+                        $total = 0;
+                        foreach ($rows as $row) {
+                            $total += floatval($row['price'] ?? 0);
+                        }
+                        $total += $repairCost;
+                        $set('total', $total);
+                    }),
+                    Forms\Components\Select::make('payment_status')
                     ->options([
                         'unpaid' => 'Unpaid',
                         'partial' => 'Partial',
@@ -135,6 +151,36 @@ class InvoiceResource extends Resource
                     ])
                     ->default('unpaid')
                     ->required(),
+                
+
+                Forms\Components\TextInput::make('total')
+                    ->required()
+                    ->numeric()
+                    ->prefix('Rs.')
+                    ->reactive()
+                    ->afterStateHydrated(function ($set, $get) {
+                        // On load, sum prices if present and add repair_cost
+                        $rows = $get('replaced_items_table') ?? [];
+                        $repairCost = floatval($get('repair_cost') ?? 0);
+                        $total = 0;
+                        foreach ($rows as $row) {
+                            $total += floatval($row['price'] ?? 0);
+                        }
+                        $total += $repairCost;
+                        $set('total', $total);
+                    })
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        // When prices or repair_cost change, update total
+                        $rows = $get('replaced_items_table') ?? [];
+                        $repairCost = floatval($get('repair_cost') ?? 0);
+                        $total = 0;
+                        foreach ($rows as $row) {
+                            $total += floatval($row['price'] ?? 0);
+                        }
+                        $total += $repairCost;
+                        $set('total', $total);
+                    }),
+                
             ]);
     }
 
@@ -173,6 +219,11 @@ class InvoiceResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                \Filament\Tables\Actions\Action::make('view_invoice')
+                    ->label('View Invoice')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => route('invoice.print', ['invoice' => $record->id]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -187,6 +238,7 @@ class InvoiceResource extends Resource
             'index' => Pages\ListInvoices::route('/'),
             'create' => Pages\CreateInvoice::route('/create'),
             'edit' => Pages\EditInvoice::route('/{record}/edit'),
+            'view-invoice' => Pages\ViewInvoice::route('/{record}/view-invoice'),
         ];
     }
 }

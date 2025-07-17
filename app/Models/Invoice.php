@@ -18,14 +18,20 @@ class Invoice extends Model
         'payment_status',
         'device_id',
         'replaced_items',
+        'replaced_items_brand',
+        'replaced_items_prices',
         'checklist_id',
+        'repair_cost',
     ];
 
     protected $casts = [
         
         'total' => 'decimal:2',
         'payment_status' => 'string',
-        
+        'replaced_items' => 'json',
+        'replaced_items_brand' => 'json',
+        'replaced_items_prices' => 'json',
+        'repair_cost' => 'decimal:2',
     ];
 
     public function repair(): BelongsTo

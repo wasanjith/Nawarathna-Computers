@@ -4,6 +4,7 @@ use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\RepairController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\CustomerCallController;
+use App\Http\Controllers\InvoicePrintController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 
@@ -45,3 +46,5 @@ Route::get('/api/repairs/next-id', [App\Http\Controllers\ChecklistController::cl
 Route::get('/test/devices', function() {
     return response()->json(['message' => 'Test route working', 'devices' => App\Models\Device::count()]);
 });
+
+Route::get('/invoice/print/{invoice}', [InvoicePrintController::class, 'show'])->name('invoice.print');
