@@ -196,6 +196,68 @@ class ChecklistController extends Controller
     }
 
     /**
+     * Update the specified checklist in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $checklist = \App\Models\CheckList::findOrFail($id);
+
+        // You may want to validate the request here
+        $data = $request->all();
+
+        // Map fields as in store method
+        $fieldMap = [
+            'Processor' => 'processor',
+            'Motherboard' => 'motherboard',
+            'RAM' => 'ram',
+            'Hard Disk 1' => 'hard_disk_1',
+            'Hard Disk 2' => 'hard_disk_2',
+            'Optical Drive' => 'optical_drive',
+            'Network' => 'network',
+            'WiFi Module' => 'wifi',
+            'Camera' => 'camera',
+            'Front USB' => 'frontUSB',
+            'Rear USB' => 'rearUSB',
+            'Front Sound' => 'frontSound',
+            'Rear Sound' => 'rearSound',
+            'VGA Port' => 'vgaPort',
+            'HDMI Port' => 'hdmiPort',
+            'Hard Health' => 'hardHealth',
+            'Stress Test' => 'stressTest',
+            'Benchmark' => 'benchMark',
+            'Power Cable 1' => 'powerCable_1',
+            'Power Cable 2' => 'powerCable_2',
+            'VGA Cable' => 'vgaCable',
+            'DVI Cable' => 'dviCable',
+            'Hinges' => 'hinges',
+            'Laptop Speakers' => 'laptopSPK',
+            'Microphone' => 'mic',
+            'TouchPad' => 'touchPad',
+            'Keyboard' => 'keyboard',
+        ];
+
+        $checklistData = [
+            'nutQty' => $request->input('nutQty', 0),
+            'backpanelnuts' => $request->input('backpanelnuts', 'yes'),
+        ];
+
+        // List of all checklist fields
+        $fields = [
+            'processor','motherboard','ram','hard_disk_1','hard_disk_2','optical_drive','network','wifi','camera','hinges','laptopSPK','mic','touchPad','keyboard',
+            'frontUSB','rearUSB','frontSound','rearSound','vgaPort','hdmiPort','hardHealth','stressTest','benchMark','powerCable_1','powerCable_2','vgaCable','dviCable',
+        ];
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $checklistData[$field] = $request->input($field);
+            }
+        }
+
+        $checklist->update($checklistData);
+
+        return redirect('/admin/repair/repairs')->with('success', 'Checklist updated successfully!');
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Checklist $checklist)

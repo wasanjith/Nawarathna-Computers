@@ -99,7 +99,7 @@
             <div class="flex flex-row items-center w-full md:w-auto gap-8">
                 <!-- Logo and website -->
                 <div class="flex flex-col items-center mr-6">
-                    <img src="/photos/logo.png" alt="Company Logo" class="w-20 h-20 object-contain mb-1">
+                    <img src="/photos/logo.png" alt="Company Logo" class="w-28 h-28 object-contain mb-1">
                     <span class="text-xs text-gray-600 mt-1">www.nccs.lk</span>
                 </div>
                 <!-- Company Info -->
@@ -120,13 +120,24 @@
                 </div>
             </div>
             <div class="mt-4 md:mt-0 flex justify-end w-full md:w-auto">
-                <a href="/admin" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
+                <a href="/admin" target="_blank" rel="noopener" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-user-shield mr-2"></i>Admin
                 </a>
             </div>
         </div>
 
-        <!-- Separated Input Fields Section -->
+        
+
+        <form method="POST" action="{{ route('checklist.save') }}">
+            @csrf
+            
+            <!-- Modern Checklist Section -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+                <div class="text-gray-900 text-center py-6 bg-white">
+                    <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
+                    <p class="text-purple-700 mt-2">Select the status for each component</p>
+                </div>
+                <!-- Separated Input Fields Section -->
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
             <div class="flex-1">
                 <label for="date" class="block text-sm font-medium mb-2">Date</label>
@@ -193,16 +204,6 @@
                 }
             });
         </script>
-
-        <form method="POST" action="{{ route('checklist.save') }}">
-            @csrf
-            
-            <!-- Modern Checklist Section -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
-                <div class="text-gray-900 text-center py-6 bg-white">
-                    <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
-                    <p class="text-purple-700 mt-2">Select the status for each component</p>
-                </div>
                 
                 <div class="p-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
