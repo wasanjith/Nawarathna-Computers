@@ -80,12 +80,19 @@
             }, 3500);
         </script>
     @endif
-    <!-- Admin Button -->
-    <div class="w-full flex justify-end mb-4">
-        <a href="/admin" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
-            <i class="fas fa-user-shield mr-2"></i>Admin
-        </a>
-    </div>
+    @if(session('error'))
+        <div id="toast-error" class="fixed top-6 right-6 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
+            <i class="fas fa-times-circle"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+        <script>
+            setTimeout(function() {
+                var toast = document.getElementById('toast-error');
+                if (toast) toast.style.display = 'none';
+            }, 3500);
+        </script>
+    @endif
+    
     <div class="max-w-7xl mx-auto p-6">
         <!-- Invoice-style Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-2xl shadow-2xl p-6 mb-6 border-b-4 border-blue-200">
@@ -101,25 +108,80 @@
                     </div>
                 </div>
             </div>
+            <div class="mt-4 md:mt-0 flex justify-end">
+                <a href="/admin" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-user-shield mr-2"></i>Admin
+                </a>
+            </div>
         </div>
 
         <!-- Separated Input Fields Section -->
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
             <div class="flex-1">
                 <label for="date" class="block text-sm font-medium mb-2">Date</label>
-                <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" value="{{ date('Y-m-d') }}" required>
+                <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" required>
             </div>
             <div class="flex-1">
                 <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
-                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="repair_id" name="repair_id" placeholder="Enter Repair ID" required list="repair_ids">
-                <datalist id="repair_ids"></datalist>
+                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" id="repair_id" name="repair_id" placeholder="Auto-generated" required readonly>
+                <div class="text-xs text-gray-500 mt-1">Auto-generated repair ID</div>
             </div>
             <div class="flex-1">
-                <label for="device_id" class="block text-sm font-medium mb-2">Device ID</label>
-                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="device_id" name="device_id" placeholder="Enter Device ID" required list="device_ids">
-                <datalist id="device_ids"></datalist>
+                <label for="time" class="block text-sm font-medium mb-2">Time</label>
+                <input 
+                    type="time" 
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" 
+                    id="time" 
+                    name="time" 
+                    required 
+                    readonly
+                >
+                <div class="text-xs text-gray-500 mt-1">Auto-filled with current time</div>
             </div>
         </div>
+        <script>
+            // Set date and time to Sri Lanka/Colombo time zone on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get current time in Asia/Colombo
+                try {
+                    const now = new Date();
+                    // Use Intl.DateTimeFormat to get Colombo time
+                    const colomboDateTime = new Intl.DateTimeFormat('en-CA', {
+                        timeZone: 'Asia/Colombo',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    }).formatToParts(now);
+
+                    let year, month, day, hour, minute;
+                    colomboDateTime.forEach(part => {
+                        if (part.type === 'year') year = part.value;
+                        if (part.type === 'month') month = part.value;
+                        if (part.type === 'day') day = part.value;
+                        if (part.type === 'hour') hour = part.value;
+                        if (part.type === 'minute') minute = part.value;
+                    });
+
+                    // Set date input
+                    if (year && month && day) {
+                        document.getElementById('date').value = `${year}-${month}-${day}`;
+                    }
+                    // Set time input
+                    if (hour && minute) {
+                        document.getElementById('time').value = `${hour}:${minute}`;
+                    }
+                } catch (e) {
+                    // Fallback: use browser time if Intl fails
+                    const now = new Date();
+                    const pad = n => n.toString().padStart(2, '0');
+                    document.getElementById('date').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+                    document.getElementById('time').value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                }
+            });
+        </script>
 
         <form method="POST" action="{{ route('checklist.save') }}">
             @csrf
@@ -135,20 +197,19 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         @php
                             $components = [
-                                ['name' => 'Brand', 'icon' => 'fas fa-tag'],
                                 ['name' => 'Processor', 'icon' => 'fas fa-microchip'],
                                 ['name' => 'Motherboard', 'icon' => 'fas fa-memory'],
                                 ['name' => 'RAM', 'icon' => 'fas fa-memory'],
-                                ['name' => 'Hard Disk', 'icon' => 'fas fa-hdd'],
-                                ['name' => 'SSD Drive', 'icon' => 'fas fa-save'],
+                                ['name' => 'Hard Disk 1', 'icon' => 'fas fa-hdd'],
+                                ['name' => 'Hard Disk 2', 'icon' => 'fas fa-hdd'],
                                 ['name' => 'Optical Drive', 'icon' => 'fas fa-compact-disc'],
-                                ['name' => 'Network Card', 'icon' => 'fas fa-network-wired'],
+                                ['name' => 'Network', 'icon' => 'fas fa-network-wired'],
                                 ['name' => 'WiFi Module', 'icon' => 'fas fa-wifi'],
                                 ['name' => 'Camera', 'icon' => 'fas fa-camera'],
                                 ['name' => 'Front USB', 'icon' => 'fab fa-usb'],
                                 ['name' => 'Rear USB', 'icon' => 'fab fa-usb'],
-                                ['name' => 'Front Audio', 'icon' => 'fas fa-volume-up'],
-                                ['name' => 'Rear Audio', 'icon' => 'fas fa-volume-up'],
+                                ['name' => 'Front Sound', 'icon' => 'fas fa-volume-up'],
+                                ['name' => 'Rear Sound', 'icon' => 'fas fa-volume-up'],
                                 ['name' => 'VGA Port', 'icon' => 'fas fa-tv'],
                                 ['name' => 'HDMI Port', 'icon' => 'fas fa-tv'],
                                 ['name' => 'Hard Health', 'icon' => 'fas fa-heartbeat'],
@@ -159,11 +220,12 @@
                                 ['name' => 'VGA Cable', 'icon' => 'fas fa-plug'],
                                 ['name' => 'DVI Cable', 'icon' => 'fas fa-plug'],
                                 ['name' => 'Hinges', 'icon' => 'fas fa-laptop'],
-                                ['name' => 'Speakers', 'icon' => 'fas fa-volume-up'],
+                                ['name' => 'Laptop Speakers', 'icon' => 'fas fa-volume-up'],
+                                ['name' => 'Camera', 'icon' => 'fas fa-camera'],
                                 ['name' => 'Microphone', 'icon' => 'fas fa-microphone'],
                                 ['name' => 'TouchPad', 'icon' => 'fas fa-hand-pointer'],
                                 ['name' => 'Keyboard', 'icon' => 'fas fa-keyboard'],
-                                ['name' => 'Back Panel', 'icon' => 'fas fa-screwdriver']
+                                
                             ];
                             
                             $statusConfig = [
@@ -196,9 +258,26 @@
                             </div>
                             
                             <input type="hidden" name="checklist[{{ $index }}][component]" value="{{ $component['name'] }}">
-                            <input type="hidden" name="checklist[{{ $index }}][status]" id="status_{{ $index }}" value="">
+                            <input type="hidden" name="checklist[{{ $index }}][status]" id="status_{{ $index }}" value="not_tested">
+                            @if(isset($component['extra']))
+                                <div class="mt-3">
+                                    <label for="{{ $component['extra']['name'] }}" class="block text-sm font-medium text-gray-700 mb-1">{{ $component['extra']['label'] }}</label>
+                                    <input type="{{ $component['extra']['type'] }}" name="{{ $component['extra']['name'] }}" id="{{ $component['extra']['name'] }}" min="{{ $component['extra']['min'] }}" placeholder="{{ $component['extra']['placeholder'] }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                                </div>
+                            @endif
                         </div>
                         @endforeach
+                        <!-- Back Panel Nut Quantity as checklist item -->
+                        <div class="component-card bg-gray-50 rounded-xl p-4 border border-gray-200">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-screwdriver text-purple-600 text-xl mr-3"></i>
+                                <h3 class="font-semibold text-gray-800 text-lg">Back Panel Nut Quantity</h3>
+                            </div>
+                            <div class="mt-3">
+                                <label for="back_panel_nut_quantity" class="block text-sm font-medium text-gray-700 mb-1">Nut Quantity</label>
+                                <input type="number" name="back_panel_nut_quantity" id="back_panel_nut_quantity" min="0" placeholder="Enter nut quantity" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -210,10 +289,16 @@
                     <h4 class="text-2xl font-bold text-gray-800">Customer Details</h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div>
+                    <div class="relative">
                         <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
-                               id="customer_name" name="customer_name" placeholder="Enter customer name" required onchange="generateSlug()">
+                        <div class="relative">
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                                   id="customer_name" name="customer_name" placeholder="Search or enter customer name" required onchange="generateSlug()" autocomplete="off">
+                            <input type="hidden" id="customer_id" name="customer_id" value="">
+                            <div id="customer_dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                <!-- Customer options will be populated here -->
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
@@ -245,10 +330,16 @@
                     <h4 class="text-2xl font-bold text-gray-800">Device Details</h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div>
+                    <div class="relative">
                         <label for="device_type" class="block text-sm font-medium text-gray-700 mb-2">Device Type</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                               id="device_type" name="device_type" placeholder="(e.g., Laptop, Desktop)" required>
+                        <div class="relative">
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                   id="device_type" name="device_type" placeholder="Search or enter device type" required autocomplete="off">
+                            <input type="hidden" id="device_id" name="device_id" value="">
+                            <div id="device_dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
+                                <!-- Device options will be populated here -->
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label for="device_brand" class="block text-sm font-medium text-gray-700 mb-2">Brand</label>
@@ -269,9 +360,21 @@
                 </div>
                 <div class="mt-6 flex flex-col md:flex-row md:space-x-6">
                     <div class="flex-1">
+                        <label for="device_id" class="block text-sm font-medium mb-2">Device ID</label>
+                        <div class="relative">
+                            @php
+                                $nextDeviceId = \DB::table('devices')->max('id') + 1;
+                            @endphp
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-50" 
+                                   id="device_id" name="device_id" 
+                                   placeholder="Suggested: {{ $nextDeviceId }}">
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">Suggested next device ID (you can change if needed)</div>
+                    </div>
+                    <div class="flex-1">
                         <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800 font-medium" id="slug_display">
-                            Slug will be auto-generated when you fill in the details...
+                            Slug will be auto-generated..
                         </div>
                         <input type="hidden" id="slug" name="slug" value="">
                     </div>
@@ -305,6 +408,45 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Load next repair ID when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNextRepairId();
+            loadNextDeviceId();
+            // Set default "Not Tested" status and style on page load for all checklist items
+            @foreach($components as $index => $component)
+                setDefaultStatus({{ $index }});
+            @endforeach
+        });
+
+        function loadNextRepairId() {
+            fetch('/api/repairs/next-id')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('repair_id').value = data.next_id;
+                })
+                .catch(error => {
+                    console.error('Error loading next repair ID:', error);
+                    // Fallback: set a placeholder value
+                    document.getElementById('repair_id').value = 'Auto-generated';
+                });
+        }
+
+        // Remove device ID dropdown logic
+        // Only keep the function to load next device ID and call it on page load and when customer changes
+
+        function loadNextDeviceId() {
+            fetch('/api/devices/next-id')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('device_id').value = data.next_id;
+                })
+                .catch(error => {
+                    console.error('Error loading next device ID:', error);
+                    // Fallback: set a placeholder value
+                    document.getElementById('device_id').value = 'Auto-generated';
+                });
+        }
+
         // Handle checkbox changes (only one can be selected per row)
         function handleCheckboxChange(rowIndex, selectedStatus) {
             const statuses = ['not_tested', 'working', 'replaced', 'removed', 'installed'];
@@ -336,64 +478,243 @@
             }
         }
 
-        // Auto-suggest for Repair ID
-        document.getElementById('repair_id').addEventListener('input', function() {
-            fetch('/api/repairs/ids?term=' + this.value)
-                .then(response => response.json())
-                .then(data => {
-                    let datalist = document.getElementById('repair_ids');
-                    datalist.innerHTML = '';
-                    data.forEach(id => {
-                        let option = document.createElement('option');
-                        option.value = id;
-                        datalist.appendChild(option);
-                    });
-                });
-        });
-        // Auto-suggest for Device ID
-        document.getElementById('device_id').addEventListener('input', function() {
-            fetch('/api/devices/ids?term=' + this.value)
-                .then(response => response.json())
-                .then(data => {
-                    let datalist = document.getElementById('device_ids');
-                    datalist.innerHTML = '';
-                    data.forEach(id => {
-                        let option = document.createElement('option');
-                        option.value = id;
-                        datalist.appendChild(option);
-                    });
-                });
-        });
 
-        // Add selectStatus function for checklist buttons
-        function selectStatus(index, status, btn) {
-            // Set the hidden input value
-            document.getElementById('status_' + index).value = status;
+        // Customer dropdown functionality
+        let customerSearchTimeout;
+        const customerNameInput = document.getElementById('customer_name');
+        const customerDropdown = document.getElementById('customer_dropdown');
+        const customerIdInput = document.getElementById('customer_id');
 
-            // Remove 'active' and color classes from all buttons in this group
-            var parent = btn.parentElement;
-            Array.from(parent.children).forEach(function(child) {
-                child.classList.remove('active');
-                child.classList.add('opacity-70');
-                // Remove any bg-* and hover:bg-* classes
-                child.className = child.className.replace(/bg-(gray|green|blue|red|purple)-[0-9]+(\s|$)/g, 'bg-white ');
-                child.className = child.className.replace(/hover:bg-(gray|green|blue|red|purple)-[0-9]+(\s|$)/g, '');
-                child.classList.remove('text-white');
-                child.classList.add('text-blue-700');
-            });
-
-            // Add 'active' and color class to the clicked button
-            btn.classList.add('active');
-            btn.classList.remove('opacity-70');
-            var colorClass = btn.getAttribute('data-color');
-            if (colorClass) {
-                colorClass.split(' ').forEach(function(cls) {
-                    btn.classList.add(cls);
-                });
-                btn.classList.remove('bg-white');
-                btn.classList.remove('text-blue-700');
-                btn.classList.add('text-white');
+        customerNameInput.addEventListener('input', function() {
+            clearTimeout(customerSearchTimeout);
+            const searchTerm = this.value.trim();
+            
+            if (searchTerm.length < 2) {
+                hideCustomerDropdown();
+                return;
             }
+
+            customerSearchTimeout = setTimeout(() => {
+                searchCustomers(searchTerm);
+            }, 300);
+        });
+
+        customerNameInput.addEventListener('focus', function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm.length >= 2) {
+                searchCustomers(searchTerm);
+            }
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!customerNameInput.contains(e.target) && !customerDropdown.contains(e.target)) {
+                hideCustomerDropdown();
+            }
+        });
+
+        function searchCustomers(term) {
+            fetch(`/api/customers/search?term=${encodeURIComponent(term)}`)
+                .then(response => response.json())
+                .then(customers => {
+                    showCustomerDropdown(customers);
+                })
+                .catch(error => {
+                    console.error('Error searching customers:', error);
+                });
+        }
+
+        function showCustomerDropdown(customers) {
+            customerDropdown.innerHTML = '';
+            
+            if (customers.length === 0) {
+                customerDropdown.innerHTML = '<div class="px-4 py-2 text-gray-500 text-sm">No customers found</div>';
+            } else {
+                customers.forEach(customer => {
+                    const option = document.createElement('div');
+                    option.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0';
+                    option.innerHTML = `
+                        <div class="font-medium text-gray-900">${customer.name}</div>
+                        <div class="text-sm text-gray-600">${customer.phone} - ${customer.city}</div>
+                    `;
+                    option.addEventListener('click', () => selectCustomer(customer));
+                    customerDropdown.appendChild(option);
+                });
+            }
+            
+            customerDropdown.classList.remove('hidden');
+        }
+
+        function hideCustomerDropdown() {
+            customerDropdown.classList.add('hidden');
+        }
+
+        function selectCustomer(customer) {
+            customerNameInput.value = customer.name;
+            customerIdInput.value = customer.id;
+            
+            // Auto-fill other customer fields
+            document.getElementById('customer_phone').value = customer.phone;
+            document.getElementById('customer_city').value = customer.city;
+            document.getElementById('whatsapp_enabled').checked = customer.whatsAppEnable === 'yes';
+            
+            hideCustomerDropdown();
+            
+            // Clear device fields when customer changes
+            clearDeviceFields();
+            loadNextDeviceId(); // <-- add this line
+        }
+
+        function clearDeviceFields() {
+            deviceTypeInput.value = '';
+            document.getElementById('device_brand').value = '';
+            document.getElementById('device_model').value = '';
+            document.getElementById('device_id').value = '';
+            hideDeviceDropdown();
+            generateSlug();
+        }
+
+        // Device dropdown functionality
+        let deviceSearchTimeout;
+        const deviceTypeInput = document.getElementById('device_type');
+        const deviceDropdown = document.getElementById('device_dropdown');
+        const deviceIdInputForType = document.getElementById('device_id');
+
+        deviceTypeInput.addEventListener('input', function() {
+            clearTimeout(deviceSearchTimeout);
+            const searchTerm = this.value.trim();
+            
+            if (searchTerm.length < 2) {
+                hideDeviceDropdown();
+                return;
+            }
+
+            deviceSearchTimeout = setTimeout(() => {
+                searchDevices(searchTerm);
+            }, 300);
+        });
+
+        deviceTypeInput.addEventListener('focus', function() {
+            const customerId = customerIdInput.value;
+            if (customerId) {
+                loadCustomerDevices(customerId);
+            }
+        });
+
+        // Hide device dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!deviceTypeInput.contains(e.target) && !deviceDropdown.contains(e.target)) {
+                hideDeviceDropdown();
+            }
+        });
+
+        function loadCustomerDevices(customerId) {
+            fetch(`/api/customers/${customerId}/devices`)
+                .then(response => response.json())
+                .then(devices => {
+                    showDeviceDropdown(devices);
+                })
+                .catch(error => {
+                    console.error('Error loading customer devices:', error);
+                });
+        }
+
+        function searchDevices(term) {
+            const customerId = customerIdInput.value;
+            if (!customerId) {
+                hideDeviceDropdown();
+                return;
+            }
+
+            fetch(`/api/customers/${customerId}/devices`)
+                .then(response => response.json())
+                .then(devices => {
+                    // Filter devices by search term
+                    const filteredDevices = devices.filter(device => 
+                        device.device_type.toLowerCase().includes(term.toLowerCase()) ||
+                        device.brand.toLowerCase().includes(term.toLowerCase()) ||
+                        device.model.toLowerCase().includes(term.toLowerCase())
+                    );
+                    showDeviceDropdown(filteredDevices);
+                })
+                .catch(error => {
+                    console.error('Error searching devices:', error);
+                });
+        }
+
+        function showDeviceDropdown(devices) {
+            deviceDropdown.innerHTML = '';
+            
+            if (devices.length === 0) {
+                deviceDropdown.innerHTML = '<div class="px-4 py-2 text-gray-500 text-sm">No devices found</div>';
+            } else {
+                devices.forEach(device => {
+                    const option = document.createElement('div');
+                    option.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0';
+                    option.innerHTML = `
+                        <div class="font-medium text-gray-900">${device.device_type}</div>
+                        <div class="text-sm text-gray-600">${device.brand} ${device.model}</div>
+                    `;
+                    option.addEventListener('click', () => selectDevice(device));
+                    deviceDropdown.appendChild(option);
+                });
+            }
+            
+            deviceDropdown.classList.remove('hidden');
+        }
+
+        function hideDeviceDropdown() {
+            deviceDropdown.classList.add('hidden');
+        }
+
+        function selectDevice(device) {
+            deviceTypeInput.value = device.device_type;
+            deviceIdInputForType.value = device.id;
+            
+            // Auto-fill other device fields
+            document.getElementById('device_brand').value = device.brand;
+            document.getElementById('device_model').value = device.model;
+            
+            hideDeviceDropdown();
+            generateSlug();
+        }
+
+        // Refresh repair ID after form submission (for creating multiple repairs)
+        document.querySelector('form').addEventListener('submit', function() {
+            // Refresh the repair ID after a short delay to get the next available ID
+            setTimeout(function() {
+                loadNextRepairId();
+            }, 1000);
+        });
+
+        // Called when a status button is clicked
+        function selectStatus(index, status, btn) {
+            // Update hidden input
+            document.getElementById('status_' + index).value = status;
+            // Update button styles
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('active');
+                b.classList.remove(...b.getAttribute('data-color').split(' '));
+            });
+            btn.classList.add('active');
+            btn.classList.add(...btn.getAttribute('data-color').split(' '));
+        }
+
+        // Set default "Not Tested" status and style on page load for all checklist items
+        function setDefaultStatus(index) {
+            // Set the hidden input to "not_tested"
+            document.getElementById('status_' + index).value = 'not_tested';
+            // Find all status buttons for this component
+            const buttons = document.querySelectorAll('[onclick^="selectStatus(' + index + ',"]');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove(...btn.getAttribute('data-color').split(' '));
+                if (btn.getAttribute('data-status') === 'not_tested') {
+                    btn.classList.add('active');
+                    btn.classList.add(...btn.getAttribute('data-color').split(' '));
+                }
+            });
         }
     </script>
 </body>

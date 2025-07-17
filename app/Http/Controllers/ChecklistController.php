@@ -29,52 +29,168 @@ class ChecklistController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('Checklist store called', ['data' => $request->all()]);
         // Validate and extract data
         $data = $request->all();
 
-        // 1. Create or update Customer
-        $customer = \App\Models\Customer::firstOrCreate(
-            [
-                'phone' => $data['customer_phone'],
-            ],
-            [
+        // 1. Handle Customer (existing or new)
+        if (!empty($data['customer_id'])) {
+            // Use existing customer
+            $customer = \App\Models\Customer::find($data['customer_id']);
+            if (!$customer) {
+                Log::error('Selected customer not found', ['customer_id' => $data['customer_id']]);
+                return redirect('/')->with('error', 'Selected customer not found.');
+            }
+            
+            // Update customer details if provided
+            $customer->update([
                 'name' => $data['customer_name'],
+                'phone' => $data['customer_phone'],
                 'city' => $data['customer_city'],
-                'whatsAppEnable' => $request->has('whatsapp_enabled') ? '1' : '0',
-            ]
-        );
+                'whatsAppEnable' => $request->has('whatsapp_enabled') ? 'yes' : 'no',
+            ]);
+            Log::info('Customer updated', ['customer' => $customer]);
+        } else {
+            // Create new customer
+            $customer = \App\Models\Customer::firstOrCreate(
+                [
+                    'phone' => $data['customer_phone'],
+                ],
+                [
+                    'name' => $data['customer_name'],
+                    'city' => $data['customer_city'],
+                    'whatsAppEnable' => $request->has('whatsapp_enabled') ? 'yes' : 'no',
+                ]
+            );
+            Log::info('Customer created or found', ['customer' => $customer]);
+        }
 
-        // 2. Create Device
-        $device = \App\Models\Device::firstOrCreate(
-            [
-                'slug' => $data['slug'] ?? null,
-                'customer_id' => $customer->id,
-            ],
-            [
+        // 2. Handle Device (existing or new)
+        $device = null;
+        if (!empty($data['device_id'])) {
+            $device = \App\Models\Device::find($data['device_id']);
+        }
+        if ($device) {
+            // Update device details if provided
+            $device->update([
                 'device_type' => $data['device_type'],
                 'brand' => $data['device_brand'],
                 'model' => $data['device_model'],
-            ]
-        );
+                'slug' => $data['slug'] ?? $device->slug,
+            ]);
+            Log::info('Device updated', ['device' => $device]);
+        } else {
+            // Create new device
+            $device = \App\Models\Device::create([
+                'device_type' => $data['device_type'],
+                'brand' => $data['device_brand'],
+                'model' => $data['device_model'],
+                'slug' => $data['slug'] ?? null,
+                'customer_id' => $customer->id,
+            ]);
+            Log::info('Device created', ['device' => $device]);
+        }
 
         // 3. Create Repair
         $repair = \App\Models\Repair::create([
             'device_id' => $device->id,
-            'customer_id' => $customer->id,
+            'customer_id' => $device->customer_id, // Use device's customer_id to ensure consistency
             'slug' => $data['slug'] ?? null,
+            'problem_description' => $data['problem_description'] ?? null,
+            'techniction_id' => $data['technician_id'] ?? null,
             // Add more fields as needed
         ]);
+        Log::info('Repair created', ['repair' => $repair]);
 
-        // 4. Create Checklist (store all checklist items)
-        if (isset($data['checklist']) && is_array($data['checklist'])) {
-            foreach ($data['checklist'] as $item) {
-                \App\Models\CheckList::create([
-                    'repair_id' => $repair->id,
-                    'component' => $item['component'] ?? null,
-                    'status' => $item['status'] ?? null,
-                ]);
+        // Update the repair ID field with the actual created repair ID
+        $data['repair_id'] = $repair->id;
+
+        // 4. Create Checklist (store all checklist items in one row)
+        $fieldMap = [
+            'Processor' => 'processor',
+            'Motherboard' => 'motherboard',
+            'RAM' => 'ram',
+            'Hard Disk 1' => 'hard_disk_1',
+            'Hard Disk 2' => 'hard_disk_2',
+            'Optical Drive' => 'optical_drive',
+            'Network' => 'network',
+            'WiFi Module' => 'wifi',
+            'Camera' => 'camera',
+            'Front USB' => 'frontUSB',
+            'Rear USB' => 'rearUSB',
+            'Front Sound' => 'frontSound',
+            'Rear Sound' => 'rearSound',
+            'VGA Port' => 'vgaPort',
+            'HDMI Port' => 'hdmiPort',
+            'Hard Health' => 'hardHealth',
+            'Stress Test' => 'stressTest',
+            'Benchmark' => 'benchMark',
+            'Power Cable 1' => 'powerCable_1',
+            'Power Cable 2' => 'powerCable_2',
+            'VGA Cable' => 'vgaCable',
+            'DVI Cable' => 'dviCable',
+            'Hinges' => 'hinges',
+            'Laptop Speakers' => 'laptopSPK',
+            'Microphone' => 'mic',
+            'TouchPad' => 'touchPad',
+            'Keyboard' => 'keyboard',
+        ];
+
+        $checklistData = [
+            'repair_id' => $repair->id,
+            'nutQty' => $request->input('back_panel_nut_quantity', 0),
+            'backpanelnuts' => $request->input('backpanelnuts', 'yes'),
+        ];
+
+        $allowedStatuses = [
+            // Fields that allow 'replaced'
+            'processor' => ['not_tested','working','replaced','removed','installed'],
+            'motherboard' => ['not_tested','working','replaced','removed','installed'],
+            'ram' => ['not_tested','working','replaced','removed','installed'],
+            'hard_disk_1' => ['not_tested','working','replaced','removed','installed'],
+            'hard_disk_2' => ['not_tested','working','replaced','removed','installed'],
+            'optical_drive' => ['not_tested','working','replaced','removed','installed'],
+            'network' => ['not_tested','working','replaced','removed','installed'],
+            'wifi' => ['not_tested','working','replaced','removed','installed'],
+            'camera' => ['not_tested','working','replaced','removed','installed'],
+            'hinges' => ['not_tested','working','replaced','removed','installed'],
+            'laptopSPK' => ['not_tested','working','replaced','removed','installed'],
+            'lapCamera' => ['not_tested','working','replaced','removed','installed'],
+            'mic' => ['not_tested','working','replaced','removed','installed'],
+            'touchPad' => ['not_tested','working','replaced','removed','installed'],
+            'keyboard' => ['not_tested','working','replaced','removed','installed'],
+            // Fields that do NOT allow 'replaced'
+            'frontUSB' => ['not_tested','working','not_working','removed','installed'],
+            'rearUSB' => ['not_tested','working','not_working','removed','installed'],
+            'frontSound' => ['not_tested','working','not_working','removed','installed'],
+            'rearSound' => ['not_tested','working','not_working','removed','installed'],
+            'vgaPort' => ['not_tested','working','not_working','removed','installed'],
+            'hdmiPort' => ['not_tested','working','not_working','removed','installed'],
+            'hardHealth' => ['not_tested','working','not_working','removed','installed'],
+            'stressTest' => ['not_tested','working','not_working','removed','installed'],
+            'benchMark' => ['not_tested','working','not_working','removed','installed'],
+            'powerCable_1' => ['not_tested','working','not_working','removed','installed'],
+            'powerCable_2' => ['not_tested','working','not_working','removed','installed'],
+            'vgaCable' => ['not_tested','working','not_working','removed','installed'],
+            'dviCable' => ['not_tested','working','not_working','removed','installed'],
+            'backpanelnuts' => ['yes','no'],
+        ];
+
+        foreach ($request->input('checklist', []) as $item) {
+            if (isset($fieldMap[$item['component']])) {
+                $dbField = $fieldMap[$item['component']];
+                $status = $item['status'];
+                if (isset($allowedStatuses[$dbField]) && in_array($status, $allowedStatuses[$dbField])) {
+                    $checklistData[$dbField] = $status;
+                } else {
+                    // fallback to default if not allowed
+                    $checklistData[$dbField] = $allowedStatuses[$dbField][0] ?? 'not_tested';
+                }
             }
         }
+
+        $checklist = \App\Models\CheckList::create($checklistData);
+        Log::info('Checklist created', ['checklist' => $checklist]);
 
         return redirect('/')->with('success', 'Repair is saved!');
     }
@@ -88,63 +204,59 @@ class ChecklistController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Search customers by name or phone
      */
-    public function update(Request $request, Checklist $checklist)
+    public function searchCustomers(Request $request)
     {
-        $validatedData = $this->getValidatedData($request);
-        $checklist->update($validatedData);
+        $term = $request->get('term', '');
+        
+        if (empty($term)) {
+            return response()->json([]);
+        }
 
-        return redirect('/admin/repair/repairs')->with('success', 'Checklist updated successfully.');
+        $customers = \App\Models\Customer::where('name', 'like', "%{$term}%")
+            ->orWhere('phone', 'like', "%{$term}%")
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'phone', 'city', 'whatsAppEnable']);
+
+        return response()->json($customers);
     }
 
-    private function getValidatedData(Request $request)
+    /**
+     * Get customer details by ID
+     */
+    public function getCustomer($id)
     {
-        return $request->validate([
-            'repair_id' => 'required|exists:repairs,id',
-            'processor_brand' => 'nullable|string|max:255',
-            'processor' => 'nullable|string',
-            'motherboard_brand' => 'nullable|string|max:255',
-            'motherboard' => 'nullable|string',
-            'ram_brand' => 'nullable|string|max:255',
-            'ram' => 'nullable|string',
-            'hard_disk_1_brand' => 'nullable|string|max:255',
-            'hard_disk_1' => 'nullable|string',
-            'hard_disk_2_brand' => 'nullable|string|max:255',
-            'hard_disk_2' => 'nullable|string',
-            'optical_drive_brand' => 'nullable|string|max:255',
-            'optical_drive' => 'nullable|string',
-            'network_brand' => 'nullable|string|max:255',
-            'network' => 'nullable|string',
-            'wifi_brand' => 'nullable|string|max:255',
-            'wifi' => 'nullable|string',
-            'camera_brand' => 'nullable|string|max:255',
-            'camera' => 'nullable|string',
-            'hinges_brand' => 'nullable|string|max:255',
-            'hinges' => 'nullable|string',
-            'laptopSPK_brand' => 'nullable|string|max:255',
-            'laptopSPK' => 'nullable|string',
-            'mic_brand' => 'nullable|string|max:255',
-            'mic' => 'nullable|string',
-            'touchPad_brand' => 'nullable|string|max:255',
-            'touchPad' => 'nullable|string',
-            'keyboard_brand' => 'nullable|string|max:255',
-            'keyboard' => 'nullable|string',
-            'frontUSB' => 'nullable|string',
-            'rearUSB' => 'nullable|string',
-            'frontSound' => 'nullable|string',
-            'rearSound' => 'nullable|string',
-            'vgaPort' => 'nullable|string',
-            'hdmiPort' => 'nullable|string',
-            'hardHealth' => 'nullable|string',
-            'stressTest' => 'nullable|string',
-            'benchMark' => 'nullable|string',
-            'powerCable_1' => 'nullable|string',
-            'powerCable_2' => 'nullable|string',
-            'vgaCable' => 'nullable|string',
-            'dviCable' => 'nullable|string',
-            'backpanelnuts' => 'nullable|string',
-            'nutQty' => 'nullable|integer|min:0',
-        ]);
+        $customer = \App\Models\Customer::find($id);
+        
+        if (!$customer) {
+            return response()->json(['error' => 'Customer not found'], 404);
+        }
+
+        return response()->json($customer);
     }
+
+    /**
+     * Get devices for a specific customer
+     */
+    public function getCustomerDevices($customerId)
+    {
+        $devices = \App\Models\Device::where('customer_id', $customerId)
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'device_type', 'brand', 'model', 'slug']);
+
+        return response()->json($devices);
+    }
+
+    /**
+     * Get the next available repair ID
+     */
+    public function getNextRepairId()
+    {
+        $nextId = \App\Models\Repair::max('id') + 1;
+        return response()->json(['next_id' => $nextId]);
+    }
+
+    
 }
