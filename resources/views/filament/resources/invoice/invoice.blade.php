@@ -3,9 +3,6 @@
     $customer = $customer ?? null;
     $device = $device ?? null;
     $checklist = $checklist ?? null;
-    $replacedItems = $replacedItems ?? [];
-    $replacedBrands = $replacedBrands ?? [];
-    $replacedPrices = $replacedPrices ?? [];
     $total = $record->total ?? 0;
 @endphp
 <!DOCTYPE html>
@@ -215,16 +212,16 @@
                 </thead>
                 <tbody>
                     @php $subTotal = 0; @endphp
-                    @forelse($replacedItems as $i => $item)
+                    @forelse(($record->replaced_items ?? []) as $item)
                         @php
                             $qty = 1;
-                            $price = floatval($replacedPrices[$i] ?? 0);
+                            $price = floatval($item['price'] ?? 0);
                             $lineTotal = $price * $qty;
                             $subTotal += $lineTotal;
                         @endphp
                         <tr>
-                            <td>{{ $item }}</td>
-                            <td>{{ $replacedBrands[$i] ?? '-' }}</td>
+                            <td>{{ $item['item'] ?? '-' }}</td>
+                            <td>{{ $item['brand'] ?? '-' }}</td>
                             <td>{{ number_format($price, 2) }}</td>
                             <td>1</td>
                             <td>{{ number_format($lineTotal, 2) }}</td>

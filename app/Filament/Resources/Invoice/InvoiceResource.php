@@ -84,7 +84,9 @@ class InvoiceResource extends Resource
                             ->numeric()
                             ->prefix('Rs.')
                             ->reactive()
-                            ->afterStateUpdated(function ($state, $set, $get) {
+                            ->afterStateUpdated(function (
+                                $state, $set, $get
+                            ) {
                                 // When a price is updated, recalculate total
                                 $rows = $get('../../replaced_items_table') ?? [];
                                 $total = 0;
@@ -98,34 +100,20 @@ class InvoiceResource extends Resource
                     ->columnSpanFull()
                     ->required(false)
                     ->afterStateHydrated(function ($component, $state, $record, $set) {
-                        // On edit, hydrate from the three columns if present
+                        // On edit, hydrate from the replaced_items column if present
                         if ($record) {
-                            $items = $record->replaced_items ?? [];
-                            $brands = $record->replaced_items_brand ?? [];
-                            $prices = $record->replaced_items_prices ?? [];
-                            $rows = [];
-                            foreach ($items as $i => $item) {
-                                $rows[] = [
-                                    'item' => $item,
-                                    'brand' => $brands[$i] ?? '',
-                                    'price' => $prices[$i] ?? '',
-                                ];
-                            }
+                            $rows = $record->replaced_items ?? [];
                             $set('replaced_items_table', $rows);
                         }
                     })
                     ->dehydrateStateUsing(function ($state) {
-                        // Only return the state, do not try to set other fields here
+                        // Dehydrate the entire array of objects
                         return $state;
                     })
-                    ->reactive(),
-
+                    ->reactive()
+                    ->dehydrated(false),
                 Forms\Components\Hidden::make('replaced_items')
-                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('item')->toArray()),
-                Forms\Components\Hidden::make('replaced_items_brand')
-                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('brand')->toArray()),
-                Forms\Components\Hidden::make('replaced_items_prices')
-                    ->dehydrateStateUsing(fn ($state, $get) => collect($get('replaced_items_table'))->pluck('price')->toArray()),
+                    ->dehydrateStateUsing(fn ($state, $get) => $get('replaced_items_table')),
                 Forms\Components\TextInput::make('repair_cost')
                     ->label('Repair Cost')
                     ->numeric()
