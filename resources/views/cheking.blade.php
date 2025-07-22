@@ -131,168 +131,6 @@
         <form method="POST" action="{{ route('checklist.save') }}">
             @csrf
             
-            <!-- Modern Checklist Section -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
-                <div class="text-gray-900 text-center py-6 bg-white">
-                    <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
-                    <p class="text-purple-700 mt-2">Select the status for each component</p>
-                </div>
-                <!-- Separated Input Fields Section -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
-            <div class="flex-1">
-                <label for="date" class="block text-sm font-medium mb-2">Date</label>
-                <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" required>
-            </div>
-            <div class="flex-1">
-                <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
-                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" id="repair_id" name="repair_id" placeholder="Auto-generated" required readonly>
-                <div class="text-xs text-gray-500 mt-1">Auto-generated repair ID</div>
-            </div>
-            <div class="flex-1">
-                <label for="time" class="block text-sm font-medium mb-2">Time</label>
-                <input 
-                    type="time" 
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" 
-                    id="time" 
-                    name="time" 
-                    required 
-                    readonly
-                >
-                <div class="text-xs text-gray-500 mt-1">Auto-filled with current time</div>
-            </div>
-        </div>
-        <script>
-            // Set date and time to Sri Lanka/Colombo time zone on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                // Get current time in Asia/Colombo
-                try {
-                    const now = new Date();
-                    // Use Intl.DateTimeFormat to get Colombo time
-                    const colomboDateTime = new Intl.DateTimeFormat('en-CA', {
-                        timeZone: 'Asia/Colombo',
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                    }).formatToParts(now);
-
-                    let year, month, day, hour, minute;
-                    colomboDateTime.forEach(part => {
-                        if (part.type === 'year') year = part.value;
-                        if (part.type === 'month') month = part.value;
-                        if (part.type === 'day') day = part.value;
-                        if (part.type === 'hour') hour = part.value;
-                        if (part.type === 'minute') minute = part.value;
-                    });
-
-                    // Set date input
-                    if (year && month && day) {
-                        document.getElementById('date').value = `${year}-${month}-${day}`;
-                    }
-                    // Set time input
-                    if (hour && minute) {
-                        document.getElementById('time').value = `${hour}:${minute}`;
-                    }
-                } catch (e) {
-                    // Fallback: use browser time if Intl fails
-                    const now = new Date();
-                    const pad = n => n.toString().padStart(2, '0');
-                    document.getElementById('date').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-                    document.getElementById('time').value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-                }
-            });
-        </script>
-                
-                <div class="p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        @php
-                            $components = [
-                                ['name' => 'Processor', 'icon' => 'fas fa-microchip'],
-                                ['name' => 'Motherboard', 'icon' => 'fas fa-memory'],
-                                ['name' => 'RAM', 'icon' => 'fas fa-memory'],
-                                ['name' => 'Hard Disk 1', 'icon' => 'fas fa-hdd'],
-                                ['name' => 'Hard Disk 2', 'icon' => 'fas fa-hdd'],
-                                ['name' => 'Optical Drive', 'icon' => 'fas fa-compact-disc'],
-                                ['name' => 'Network', 'icon' => 'fas fa-network-wired'],
-                                ['name' => 'WiFi Module', 'icon' => 'fas fa-wifi'],
-                                ['name' => 'Camera', 'icon' => 'fas fa-camera'],
-                                ['name' => 'Front USB', 'icon' => 'fab fa-usb'],
-                                ['name' => 'Rear USB', 'icon' => 'fab fa-usb'],
-                                ['name' => 'Front Sound', 'icon' => 'fas fa-volume-up'],
-                                ['name' => 'Rear Sound', 'icon' => 'fas fa-volume-up'],
-                                ['name' => 'VGA Port', 'icon' => 'fas fa-tv'],
-                                ['name' => 'HDMI Port', 'icon' => 'fas fa-tv'],
-                                ['name' => 'Hard Health', 'icon' => 'fas fa-heartbeat'],
-                                ['name' => 'Stress Test', 'icon' => 'fas fa-chart-line'],
-                                ['name' => 'Benchmark', 'icon' => 'fas fa-tachometer-alt'],
-                                ['name' => 'Power Cable 1', 'icon' => 'fas fa-plug'],
-                                ['name' => 'Power Cable 2', 'icon' => 'fas fa-plug'],
-                                ['name' => 'VGA Cable', 'icon' => 'fas fa-plug'],
-                                ['name' => 'DVI Cable', 'icon' => 'fas fa-plug'],
-                                ['name' => 'Hinges', 'icon' => 'fas fa-laptop'],
-                                ['name' => 'Laptop Speakers', 'icon' => 'fas fa-volume-up'],
-                                ['name' => 'Microphone', 'icon' => 'fas fa-microphone'],
-                                ['name' => 'TouchPad', 'icon' => 'fas fa-hand-pointer'],
-                                ['name' => 'Keyboard', 'icon' => 'fas fa-keyboard'],
-                                
-                            ];
-                            
-                            $statusConfig = [
-                                'not_tested' => ['color' => 'bg-gray-500 hover:bg-gray-600', 'text' => 'Not Tested', 'icon' => 'fas fa-question'],
-                                'working' => ['color' => 'bg-green-500 hover:bg-green-600', 'text' => 'Working', 'icon' => 'fas fa-check'],
-                                'replaced' => ['color' => 'bg-blue-500 hover:bg-blue-600', 'text' => 'Replaced', 'icon' => 'fas fa-sync-alt'],
-                                'removed' => ['color' => 'bg-red-500 hover:bg-red-600', 'text' => 'Removed', 'icon' => 'fas fa-times'],
-                                'installed' => ['color' => 'bg-purple-500 hover:bg-purple-600', 'text' => 'Installed', 'icon' => 'fas fa-plus']
-                            ];
-                        @endphp
-                        
-                        @foreach($components as $index => $component)
-                        <div class="component-card bg-gray-50 rounded-xl p-4 border border-gray-200">
-                            <div class="flex items-center mb-3">
-                                <i class="{{ $component['icon'] }} text-purple-600 text-xl mr-3"></i>
-                                <h3 class="font-semibold text-gray-800 text-lg">{{ $component['name'] }}</h3>
-                            </div>
-                            
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($statusConfig as $status => $config)
-                                <button type="button" 
-                                        class="status-btn bg-white border-2 border-blue-500 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all duration-300 opacity-70 hover:opacity-100"
-                                        data-color="{{ $config['color'] }}"
-                                        data-status="{{ $status }}"
-                                        onclick="selectStatus({{ $index }}, '{{ $status }}', this)">
-                                    <i class="{{ $config['icon'] }} text-xs"></i>
-                                    <span>{{ $config['text'] }}</span>
-                                </button>
-                                @endforeach
-                            </div>
-                            
-                            <input type="hidden" name="checklist[{{ $index }}][component]" value="{{ $component['name'] }}">
-                            <input type="hidden" name="checklist[{{ $index }}][status]" id="status_{{ $index }}" value="not_tested">
-                            @if(isset($component['extra']))
-                                <div class="mt-3">
-                                    <label for="{{ $component['extra']['name'] }}" class="block text-sm font-medium text-gray-700 mb-1">{{ $component['extra']['label'] }}</label>
-                                    <input type="{{ $component['extra']['type'] }}" name="{{ $component['extra']['name'] }}" id="{{ $component['extra']['name'] }}" min="{{ $component['extra']['min'] }}" placeholder="{{ $component['extra']['placeholder'] }}" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
-                                </div>
-                            @endif
-                        </div>
-                        @endforeach
-                        <!-- Back Panel Nut Quantity as checklist item -->
-                        <div class="component-card bg-gray-50 rounded-xl p-4 border border-gray-200">
-                            <div class="flex items-center mb-3">
-                                <i class="fas fa-screwdriver text-purple-600 text-xl mr-3"></i>
-                                <h3 class="font-semibold text-gray-800 text-lg">Back Panel Nut Quantity</h3>
-                            </div>
-                            <div class="mt-3">
-                                <label for="back_panel_nut_quantity" class="block text-sm font-medium text-gray-700 mb-1">Nut Quantity</label>
-                                <input type="number" name="back_panel_nut_quantity" id="back_panel_nut_quantity" min="0" placeholder="Enter nut quantity" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Customer Details Section -->
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
                 <div class="flex items-center mb-6">
@@ -405,10 +243,344 @@
                 
             </div>
 
+            <!-- Checklist Section -->
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+                <div class="text-gray-900 text-center py-6 bg-white">
+                    <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
+                    <p class="text-purple-700 mt-2">Select the status for each component</p>
+                </div>
+                
+                <!-- Date, Repair ID, and Time Fields -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <label for="date" class="block text-sm font-medium mb-2">Date</label>
+                        <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
+                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" id="repair_id" name="repair_id" placeholder="Auto-generated" required readonly>
+                        <div class="text-xs text-gray-500 mt-1">Auto-generated repair ID</div>
+                    </div>
+                    <div class="flex-1">
+                        <label for="time" class="block text-sm font-medium mb-2">Time</label>
+                        <input 
+                            type="time" 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" 
+                            id="time" 
+                            name="time" 
+                            required 
+                            readonly
+                        >
+                        <div class="text-xs text-gray-500 mt-1">Auto-filled with current time</div>
+                    </div>
+                </div>
+        <script>
+            // Set date and time to Sri Lanka/Colombo time zone on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get current time in Asia/Colombo
+                try {
+                    const now = new Date();
+                    // Use Intl.DateTimeFormat to get Colombo time
+                    const colomboDateTime = new Intl.DateTimeFormat('en-CA', {
+                        timeZone: 'Asia/Colombo',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    }).formatToParts(now);
+
+                    let year, month, day, hour, minute;
+                    colomboDateTime.forEach(part => {
+                        if (part.type === 'year') year = part.value;
+                        if (part.type === 'month') month = part.value;
+                        if (part.type === 'day') day = part.value;
+                        if (part.type === 'hour') hour = part.value;
+                        if (part.type === 'minute') minute = part.value;
+                    });
+
+                    // Set date input
+                    if (year && month && day) {
+                        document.getElementById('date').value = `${year}-${month}-${day}`;
+                    }
+                    // Set time input
+                    if (hour && minute) {
+                        document.getElementById('time').value = `${hour}:${minute}`;
+                    }
+                } catch (e) {
+                    // Fallback: use browser time if Intl fails
+                    const now = new Date();
+                    const pad = n => n.toString().padStart(2, '0');
+                    document.getElementById('date').value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+                    document.getElementById('time').value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                }
+            });
+        </script>
+                
+                <div class="p-6">
+                    <table class="checklist-table w-full border-collapse mb-5">
+                        <thead>
+                            <tr>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs"></th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Not Tested</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Working</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Replaced</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Removed</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Installed</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs"></th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Not Tested</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Working</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Not Working</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Removed</th>
+                                <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs">Installed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Processor</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="processor" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="processor" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="processor" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="processor" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="processor" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Front USB</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontUSB" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontUSB" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontUSB" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontUSB" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontUSB" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Motherboard</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="motherboard" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="motherboard" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="motherboard" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="motherboard" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="motherboard" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Rear USB</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearUSB" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearUSB" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearUSB" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearUSB" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearUSB" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Ram</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="ram" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="ram" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="ram" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="ram" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="ram" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Front Sound</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontSound" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontSound" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontSound" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontSound" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="frontSound" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Hard Disk</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_1" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_1" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_1" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_1" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_1" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Rear Sound</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearSound" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearSound" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearSound" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearSound" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="rearSound" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Hard Disk</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_2" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_2" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_2" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_2" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hard_disk_2" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>VGA Port</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaPort" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaPort" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaPort" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaPort" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaPort" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Optical Drive</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="optical_drive" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="optical_drive" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="optical_drive" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="optical_drive" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="optical_drive" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>HDMI Port</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hdmiPort" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hdmiPort" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hdmiPort" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hdmiPort" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hdmiPort" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Network</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Hard Health</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Wifi</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Stress Test</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Camera</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Benchmark</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>PowerCable1</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_1" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_1" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_1" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_1" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_1" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Hinges</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hinges" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hinges" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hinges" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hinges" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hinges" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>PowerCable2</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_2" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_2" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_2" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_2" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="powerCable_2" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Laptop SPK</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="laptopSPK" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="laptopSPK" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="laptopSPK" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="laptopSPK" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="laptopSPK" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>VGACable</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaCable" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaCable" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaCable" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaCable" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="vgaCable" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Mic</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="mic" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="mic" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="mic" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="mic" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="mic" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>DVI Cable</strong></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="dviCable" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="dviCable" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="dviCable" value="not_working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="dviCable" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="dviCable" value="installed" class="w-4 h-4 m-0"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">TouchPad</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="touchPad" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="touchPad" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="touchPad" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="touchPad" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="touchPad" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle">Keyboard</td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="keyboard" value="not_tested" class="w-4 h-4 m-0" checked></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="keyboard" value="working" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="keyboard" value="replaced" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="keyboard" value="removed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="keyboard" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                                <td class="border border-gray-300 p-2 text-center align-middle"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="back-panel-section mt-5 p-4 bg-gray-50 rounded">
+                        <label class="mr-4 font-bold">Back Panel Nuts:</label>
+                        <input type="radio" name="backpanelnuts" value="yes" class="mr-2" checked> Yes
+                        <input type="radio" name="backpanelnuts" value="no" class="mr-2 ml-4"> No
+                        
+                        <label style="margin-left: 20px;" class="ml-5 font-bold">Quantity:</label>
+                        <input type="number" name="nutQty" value="0" class="qty-input w-16 p-1 border border-gray-300 rounded ml-1" min="0">
+                    </div>
+                </div>
+            </div>
+            </div>
+
             <!-- Submit Button -->
             <div class="text-center">
                 <button type="submit" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-tools mr-2"></i>Create Repair Order
+                    <i class="fas fa-tools mr-2"></i>Save Checklist
                 </button>
             </div>
         </form>
@@ -422,10 +594,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadNextRepairId();
             loadNextDeviceId();
-            // Set default "Not Tested" status and style on page load for all checklist items
-            @foreach($components as $index => $component)
-                setDefaultStatus({{ $index }});
-            @endforeach
         });
 
         function loadNextRepairId() {
@@ -686,35 +854,7 @@
             }, 1000);
         });
 
-        // Called when a status button is clicked
-        function selectStatus(index, status, btn) {
-            // Update hidden input
-            document.getElementById('status_' + index).value = status;
-            // Update button styles
-            const buttons = btn.parentElement.querySelectorAll('button');
-            buttons.forEach(b => {
-                b.classList.remove('active');
-                b.classList.remove(...b.getAttribute('data-color').split(' '));
-            });
-            btn.classList.add('active');
-            btn.classList.add(...btn.getAttribute('data-color').split(' '));
-        }
 
-        // Set default "Not Tested" status and style on page load for all checklist items
-        function setDefaultStatus(index) {
-            // Set the hidden input to "not_tested"
-            document.getElementById('status_' + index).value = 'not_tested';
-            // Find all status buttons for this component
-            const buttons = document.querySelectorAll('[onclick^="selectStatus(' + index + ',"]');
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.remove(...btn.getAttribute('data-color').split(' '));
-                if (btn.getAttribute('data-status') === 'not_tested') {
-                    btn.classList.add('active');
-                    btn.classList.add(...btn.getAttribute('data-color').split(' '));
-                }
-            });
-        }
     </script>
 </body>
 </html>
