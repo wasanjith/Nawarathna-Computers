@@ -115,14 +115,8 @@ class RepairResource extends Resource
                     })
                     ->sortable(false)
                     ->searchable(false),
-                Tables\Columns\SelectColumn::make('techniction_id')
-                    ->label('Technician')
-                    ->options(fn () => \App\Models\Techniction::pluck('name', 'id')->toArray())
-                    ->searchable()
-                    ->sortable()
-                    ->placeholder('Not Assigned')
-                    ->default(null)
-                    ->selectablePlaceholder('Select Technician'),
+                // Remove the Call History column entirely
+                // (No call_history_button column)
 
             ])
             ->filters([
@@ -136,7 +130,12 @@ class RepairResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('call_history')
+                    ->label('Call History')
+                    ->icon('heroicon-o-phone')
+                    ->url(fn(Repair $record): string => route('customer.callhistory', ['customer' => $record->customer_id]))
+                    ->openUrlInNewTab()
+                    ->visible(fn(Repair $record): bool => !empty($record->customer_id)),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('checklist')
                     ->label('Checklist')
@@ -163,8 +162,6 @@ class RepairResource extends Resource
     {
         return [
             'index' => Pages\ListRepairs::route('/'),
-            'create' => Pages\CreateRepair::route('/create'),
-            'edit' => Pages\EditRepair::route('/{record}/edit'),
         ];
     }
 }

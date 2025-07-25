@@ -13,7 +13,7 @@ class ViewRepair extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            // Removed Actions\EditAction::make(),
         ];
     }
 }
