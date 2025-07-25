@@ -17,6 +17,7 @@ class Customer extends Model
         'phone',
         'city',
         'whatsAppEnable',
+        'customer_state',
     ];
 
     protected $casts = [

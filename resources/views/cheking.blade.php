@@ -28,8 +28,8 @@
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 34px;
+            width: 48px;
+            height: 26px;
         }
         .toggle-switch input {
             opacity: 0;
@@ -45,13 +45,13 @@
             bottom: 0;
             background-color: #ccc;
             transition: .4s;
-            border-radius: 34px;
+            border-radius: 26px;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px;
-            width: 26px;
+            height: 18px;
+            width: 18px;
             left: 4px;
             bottom: 4px;
             background-color: white;
@@ -62,11 +62,11 @@
             background-color: #25D366;
         }
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(22px);
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen font-sans">
     <!-- Toast Message -->
     @if(session('success'))
         <div id="toast-message" class="fixed top-6 right-6 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
@@ -92,56 +92,61 @@
             }, 3500);
         </script>
     @endif
-    
-    <div class="max-w-7xl mx-auto p-6">
-        <!-- Invoice-style Header -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-2xl shadow-2xl p-6 mb-6 border-b-4 border-blue-200">
-            <div class="flex flex-row items-center w-full md:w-auto gap-8">
-                <!-- Logo and website -->
-                <div class="flex flex-col items-center mr-6">
-                    <img src="/photos/logo.png" alt="Company Logo" class="w-28 h-28 object-contain mb-1">
-                    <span class="text-xs text-gray-600 mt-1">www.nccs.lk</span>
+
+    <!-- Improved Header: readable, compact, and aligned with content width -->
+    <header class="bg-white/90 rounded-xl shadow-lg p-4 md:p-6 max-w-5xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div class="flex flex-row items-center gap-4">
+                <div class="flex flex-col items-center mr-3">
+                    <img src="/photos/logo.png" alt="Company Logo" class="w-16 h-16 object-contain mb-1 drop-shadow-lg">
+                    <span class="text-xs text-gray-700 mt-1 tracking-wide">www.nccs.lk</span>
                 </div>
-                <!-- Company Info -->
                 <div class="flex flex-col justify-center">
-                    <div class="text-3xl md:text-5xl font-extrabold tracking-widest text-gray-900 leading-none" style="letter-spacing:0.4em;">
+                    <div class="text-xl md:text-2xl font-extrabold tracking-widest text-gray-900 leading-none" style="letter-spacing:0.2em;">
                         NAWARATHNA
                     </div>
-                    <div class="text-2xl md:text-3xl font-light text-gray-800 leading-tight -mt-1 mb-2">
+                    <div class="text-base md:text-lg font-light text-gray-700 leading-tight -mt-1 mb-1">
                         Cellular & Computer Systems
                     </div>
-                    <div class="text-base text-gray-700 font-normal">
+                    <div class="text-xs text-gray-700 font-normal">
                         <span>No 339, Colombo Road, Pilimathalawa. </span>
-                        <span class="font-semibold">thenccs@gmail.com</span>
+                        <span class="font-semibold text-blue-700">thenccs@gmail.com</span>
                     </div>
-                    <div class="text-base text-gray-700 font-normal">
+                    <div class="text-xs text-blue-700 font-normal">
                         081-2577370, 0777-977070, 0777-535121
                     </div>
                 </div>
             </div>
-            <div class="mt-4 md:mt-0 flex justify-end w-full md:w-auto">
-                <a href="/admin" target="_blank" rel="noopener" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-xl text-base shadow-lg transition-all duration-300 transform hover:scale-105">
+            <div class="mt-2 md:mt-0 flex justify-end w-full md:w-auto">
+                <a href="/admin" target="_blank" rel="noopener" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-xl text-sm shadow-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-user-shield mr-2"></i>Admin
                 </a>
             </div>
         </div>
+    </header>
 
-        
-
-        <form method="POST" action="{{ route('checklist.save') }}">
+    <main class="max-w-5xl mx-auto p-2 md:p-4">
+        <form method="POST" action="{{ route('checklist.save') }}" class="space-y-4">
             @csrf
-            
             <!-- Customer Details Section -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                <div class="flex items-center mb-6">
-                    <i class="fas fa-user text-purple-600 text-2xl mr-3"></i>
-                    <h4 class="text-2xl font-bold text-gray-800">Customer Details</h4>
+            <section class="bg-white/90 rounded-xl shadow-lg p-4 md:p-6 mb-2">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-user text-purple-600 text-xl mr-2"></i>
+                    <h4 class="text-xl font-bold text-gray-800">Customer Details</h4>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
                     <div class="relative">
-                        <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">Customer Name</label>
+                        <label for="customer_state" class="block text-sm font-medium text-gray-700 mb-1">Customer Salutation</label>
+                        <select id="customer_state" name="customer_state" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm">
+                            <option value="Mr">Mr</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Miss">Miss</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
                         <div class="relative">
-                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                            <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
                                    id="customer_name" name="customer_name" placeholder="Search or enter customer name" required onchange="generateSlug()" autocomplete="off">
                             <input type="hidden" id="customer_id" name="customer_id" value="">
                             <div id="customer_dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
@@ -150,44 +155,33 @@
                         </div>
                     </div>
                     <div>
-                        <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                        <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                        <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
                                id="customer_phone" name="customer_phone" placeholder="Enter phone number" required>
                     </div>
                     <div>
-                        <label for="customer_phone2" class="block text-sm font-medium text-gray-700 mb-2">Phone 2</label>
-                        <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                        <label for="customer_phone2" class="block text-sm font-medium text-gray-700 mb-1">Phone 2</label>
+                        <input type="tel" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
                                id="customer_phone2" name="customer_phone2" placeholder="Enter second phone number (optional)">
                     </div>
                     <div>
-                        <label for="customer_city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
-                               id="customer_city" name="customer_city" placeholder="Enter city" required>
-                    </div>
-                    <div>
-                        <label for="whatsapp_enabled" class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Enabled</label>
-                        <div class="flex items-center mt-3">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="1" checked>
-                                <span class="slider"></span>
-                            </label>
-                            <span class="ml-3 text-sm text-gray-600">Enable WhatsApp notifications</span>
-                        </div>
+                        <label for="customer_city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
+                               id="customer_city" name="customer_city" placeholder="Enter city" required value="Pilimathalawa">
                     </div>
                 </div>
-            </div>
-
+            </section>
             <!-- Device Details Section -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                <div class="flex items-center mb-6">
-                    <i class="fas fa-laptop text-purple-600 text-2xl mr-3"></i>
-                    <h4 class="text-2xl font-bold text-gray-800">Device Details</h4>
+            <section class="bg-white/90 rounded-xl shadow-lg p-4 md:p-6 mb-2">
+                <div class="flex items-center mb-3">
+                    <i class="fas fa-laptop text-purple-600 text-xl mr-2"></i>
+                    <h4 class="text-xl font-bold text-gray-800">Device Details</h4>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     <div class="relative">
-                        <label for="device_type" class="block text-sm font-medium text-gray-700 mb-2">Device Type</label>
+                        <label for="device_type" class="block text-sm font-medium text-gray-700 mb-1">Device Type</label>
                         <div class="relative">
-                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                            <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm"
                                    id="device_type" name="device_type" placeholder="Search or enter device type" required autocomplete="off">
                             <input type="hidden" id="device_id" name="device_id" value="">
                             <div id="device_dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden">
@@ -196,31 +190,48 @@
                         </div>
                     </div>
                     <div>
-                        <label for="device_brand" class="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                        <label for="device_brand" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
                                id="device_brand" name="device_brand" placeholder="Enter brand (e.g., Acer)" required onchange="generateSlug()">
                     </div>
                     <div>
-                        <label for="device_model" class="block text-sm font-medium text-gray-700 mb-2">Model</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                        <label for="device_model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm" 
                                id="device_model" name="device_model" placeholder="Enter model (e.g., Laptop)" required onchange="generateSlug()">
                     </div>
                     <div>
-                        <label for="problem_description" class="block text-sm font-medium text-gray-700 mb-2">Problem Description</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
-                               id="problem_description" name="problem_description" placeholder="Problem" required>
+                        <label for="problem_description" class="block text-sm font-medium text-gray-700 mb-1">Problem Description</label>
+                        <input list="problem_descriptions" id="problem_description" name="problem_description"
+                               class="w-full px-3 py-2 rounded-lg border border-gray-300 mt-1 text-sm"
+                               placeholder="Type or select a problem...">
+                        <datalist id="problem_descriptions">
+                            <option value="No Power">
+                            <option value="No Display">
+                            <option value="Slow Performance">
+                            <option value="Overheating">
+                            <option value="Blue Screen/Crashes">
+                            <option value="No Sound">
+                            <option value="USB Ports Not Working">
+                            <option value="Keyboard/Mouse Not Working">
+                            <option value="WiFi Not Connecting">
+                            <option value="Hard Disk Failure">
+                            <option value="Software Issues">
+                            <option value="Virus/Malware">
+                            <option value="Battery Not Charging">
+                            <option value="Screen Flickering">
+                        </datalist>
                     </div>
                     
                 </div>
-                <div class="mt-6 flex flex-col md:flex-row md:space-x-6">
+                <div class="mt-3 flex flex-col md:flex-row md:space-x-4 gap-2">
                     <div class="flex-1">
-                        <label for="device_id" class="block text-sm font-medium mb-2">Serial Number</label>
+                        <label for="device_id" class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
                         <div class="relative">
                             @php
                                 $nextDeviceId = \DB::table('devices')->max('id') + 1;
                                 $nextDeviceIdPadded = str_pad($nextDeviceId, 4, '0', STR_PAD_LEFT);
                             @endphp
-                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-50" 
+                            <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-50 text-sm" 
                                    id="device_id" name="device_id" 
                                    placeholder="Suggested: {{ $nextDeviceIdPadded }}"
                                    value="{{ $nextDeviceIdPadded }}">
@@ -228,51 +239,38 @@
                         <div class="text-xs text-gray-500 mt-1">Suggested next serial number (4 digits, e.g., 0014). You can change if needed.</div>
                     </div>
                     <div class="flex-1">
-                        <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800 font-medium" id="slug_display">
+                        <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">Auto-Generated Slug</label>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-800 font-medium text-sm" id="slug_display">
                             Slug will be auto-generated.
                         </div>
                         <input type="hidden" id="slug" name="slug" value="">
                     </div>
-                    <div class="flex-1 mt-6 md:mt-0">
-                        <label for="technician_id" class="block text-sm font-medium text-gray-700 mb-2">Assign Technician</label>
-                        <select id="technician_id" name="technician_id" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" required>
-                            <option value="">Select a technician</option>
-                            @php
-                                $technicians = \DB::table('technictions')->orderBy('name')->get();
-                            @endphp
-                            @foreach($technicians as $technician)
-                                <option value="{{ $technician->id }}">{{ $technician->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
                 </div>
                 
-            </div>
+            </section>
 
             <!-- Checklist Section -->
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
-                <div class="text-gray-900 text-center py-6 bg-white">
-                    <h2 class="text-3xl font-bold">DEVICE CHECKLIST</h2>
-                    <p class="text-purple-700 mt-2">Select the status for each component</p>
+            <section class="bg-white/95 rounded-xl shadow-2xl overflow-hidden mb-2">
+                <div class="text-gray-900 text-center py-4 bg-white/80">
+                    <h2 class="text-2xl font-bold">DEVICE CHECKLIST</h2>
                 </div>
                 
                 <!-- Date, Repair ID, and Time Fields -->
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
+                <div class="bg-white/90 rounded-xl shadow-lg p-4 mb-2 flex flex-col md:flex-row gap-3">
                     <div class="flex-1">
-                        <label for="date" class="block text-sm font-medium mb-2">Date</label>
-                        <input type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none" id="date" name="date" required>
+                        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm" id="date" name="date" required>
                     </div>
                     <div class="flex-1">
-                        <label for="repair_id" class="block text-sm font-medium mb-2">Repair ID</label>
-                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" id="repair_id" name="repair_id" placeholder="Auto-generated" required readonly>
+                        <label for="repair_id" class="block text-sm font-medium text-gray-700 mb-1">Repair ID</label>
+                        <input type="text" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed text-sm" id="repair_id" name="repair_id" placeholder="Auto-generated" required readonly>
                         <div class="text-xs text-gray-500 mt-1">Auto-generated repair ID</div>
                     </div>
                     <div class="flex-1">
-                        <label for="time" class="block text-sm font-medium mb-2">Time</label>
+                        <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
                         <input 
                             type="time" 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed" 
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 shadow-md bg-gray-50 cursor-not-allowed text-sm" 
                             id="time" 
                             name="time" 
                             required 
@@ -325,8 +323,8 @@
             });
         </script>
                 
-                <div class="p-6">
-                    <table class="checklist-table w-full border-collapse mb-5">
+                <div class="p-2 md:p-4">
+                    <table class="checklist-table w-full border-collapse mb-2 text-xs md:text-sm">
                         <thead>
                             <tr>
                                 <th class="border border-gray-300 p-2 text-center bg-gray-50 font-bold text-xs"></th>
@@ -577,29 +575,33 @@
                         </tbody>
                     </table>
                     
-                    <div class="back-panel-section mt-5 p-4 bg-gray-50 rounded">
-                        <label class="mr-4 font-bold">Back Panel Nuts:</label>
-                        <input type="radio" name="backpanelnuts" value="yes" class="mr-2" checked> Yes
-                        <input type="radio" name="backpanelnuts" value="no" class="mr-2 ml-4"> No
-                        
-                        <label style="margin-left: 20px;" class="ml-5 font-bold">Quantity:</label>
-                        <input type="number" name="nutQty" value="0" class="qty-input w-16 p-1 border border-gray-300 rounded ml-1" min="0">
+                    <div class="back-panel-section mt-2 p-2 bg-gray-50 rounded flex items-center justify-between">
+                        <div class="flex items-center">
+                            <label class="ml-2 font-bold">Back Panel Nuts Quantity:</label>
+                            <input type="number" name="nutQty" value="0" class="qty-input w-14 p-1 border border-gray-300 rounded ml-2" min="0">
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <label for="technician_id" class="block text-sm font-medium text-gray-700 mb-1">Assign Technician</label>
+                                <select id="technician_id" name="technician_id" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-sm">
+                                    <option value="">Select a technician</option>
+                                    @php
+                                        $technicians = \DB::table('technictions')->orderBy('name')->get();
+                                    @endphp
+                                    @foreach($technicians as $technician)
+                                        <option value="{{ $technician->id }}">{{ $technician->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl drop-shadow-lg">
+                                <i class="fas fa-tools mr-2"></i>Save Checklist
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <i class="fas fa-tools mr-2"></i>Save Checklist
-                </button>
-            </div>
+            </section>
         </form>
-
-        <!-- Company Information -->
-        <!-- Removed duplicate footer/company info as it's now in the header -->
-    </div>
+    </main>
 
     <script>
         // Load next repair ID when page loads
@@ -736,7 +738,6 @@
             document.getElementById('customer_phone').value = customer.phone;
             document.getElementById('customer_phone2').value = customer.phone2; // Add this line
             document.getElementById('customer_city').value = customer.city;
-            document.getElementById('whatsapp_enabled').checked = customer.whatsAppEnable === 'yes';
             
             hideCustomerDropdown();
             
@@ -884,6 +885,14 @@
                 });
             }
         });
+
+        // Show/hide the 'Other' problem description input
+        const problemDescriptionSelect = document.getElementById('problem_description_select');
+        const problemDescriptionCustom = document.getElementById('problem_description_custom');
+        if (problemDescriptionSelect && problemDescriptionCustom) {
+            // The 'Other' option is removed, so we don't need to check for it.
+            // The custom input is always visible.
+        }
 
 
     </script>

@@ -43,7 +43,17 @@ class RepairController extends Controller
         // Logic to store a new repair.
         // For example:
         // $validatedData = $request->validate([...]);
-        // Repair::create($validatedData);
+        // $repair = Repair::create($validatedData);
+        // Log activity
+        if (auth()->check()) {
+            \App\Models\Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'created',
+                'subject_type' => Repair::class,
+                'subject_id' => isset($repair) ? $repair->id : null,
+                'description' => 'Created a new repair',
+            ]);
+        }
         // return redirect()->route('admin.repairs.index');
     }
 
@@ -86,6 +96,16 @@ class RepairController extends Controller
         // For example:
         // $validatedData = $request->validate([...]);
         // $repair->update($validatedData);
+        // Log activity
+        if (auth()->check()) {
+            \App\Models\Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'updated',
+                'subject_type' => Repair::class,
+                'subject_id' => $repair->id,
+                'description' => 'Updated a repair',
+            ]);
+        }
         // return redirect()->route('admin.repairs.index');
     }
 

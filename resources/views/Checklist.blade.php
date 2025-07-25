@@ -5,9 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Repair Checklist</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .checklist-container {
+                box-shadow: none !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .print\:hidden { display: none !important; }
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans p-5">
     <div class="checklist-container bg-white p-5 rounded-lg shadow-md max-w-7xl mx-auto">
+        <div id="print-header" class="mb-6 w-full border-b-2 border-gray-300 pb-4">
+            <div class="flex items-center w-full mb-2">
+                <img src="/photos/logo.png" alt="Logo" class="h-20 mr-6">
+                <div class="flex-1">
+                    <div class="font-extrabold text-4xl tracking-widest leading-tight text-gray-900 w-full">NAWARATHNA</div>
+                    <div class="font-bold text-2xl text-gray-800 w-full">Cellular & Computer Systems</div>
+                    <div class="text-base text-gray-700 w-full">No 339, Colombo Road, Pilimathalawa. <span class="font-semibold">thencs@gmail.com</span></div>
+                    <div class="text-base text-gray-700 w-full">081-2577370, 0777-977070, 0777-535121</div>
+                </div>
+            </div>
+            <div class="flex flex-row flex-wrap justify-between items-center text-base font-medium text-gray-800 w-full bg-gray-50 rounded px-4 py-2 mt-2">
+                <div class="flex-1 min-w-[150px]">
+                    <span class="font-bold">Date:</span> {{ now()->format('Y-m-d') }}
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <span class="font-bold">Customer:</span> {{ ($repair ?? $checklist->repair)->customer->name ?? '' }}
+                </div>
+                <div class="flex-1 min-w-[250px]">
+                    <span class="font-bold">Device:</span> {{ ($repair ?? $checklist->repair)->device->name ?? '' }}
+                    <span class="mx-2">|</span>
+                    <span class="font-bold">Model:</span> {{ ($repair ?? $checklist->repair)->device->model ?? '' }}
+                    <span class="mx-2">|</span>
+                    <span class="font-bold">Brand:</span> {{ ($repair ?? $checklist->repair)->device->brand ?? '' }}
+                </div>
+            </div>
+        </div>
+        <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded mb-4 print:hidden">Print</button>
         <h2 class="text-2xl font-bold mb-4">Repair Checklist</h2>
         
         <form action="{{ isset($checklist) ? route('checklist.update', $checklist->id) : route('checklist.store') }}" method="POST">
@@ -266,11 +312,7 @@
             </table>
             
             <div class="back-panel-section mt-5 p-4 bg-gray-50 rounded">
-                <label class="mr-4 font-bold">Back Panel Nuts:</label>
-                <input type="radio" name="backpanelnuts" value="yes" {{ old('backpanelnuts', $checklist->backpanelnuts ?? 'yes') == 'yes' ? 'checked' : '' }} class="mr-2"> Yes
-                <input type="radio" name="backpanelnuts" value="no" {{ old('backpanelnuts', $checklist->backpanelnuts ?? '') == 'no' ? 'checked' : '' }} class="mr-2 ml-4"> No
-                
-                <label style="margin-left: 20px;" class="ml-5 font-bold">Quantity:</label>
+                <label style="margin-left: 0px;" class="ml-5 font-bold">Back Panel Nuts Quantity:</label>
                 <input type="number" name="nutQty" value="{{ old('nutQty', $checklist->nutQty ?? 0) }}" class="qty-input w-16 p-1 border border-gray-300 rounded ml-1" min="0">
             </div>
             

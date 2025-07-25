@@ -48,6 +48,7 @@ class ChecklistController extends Controller
                 'phone' => $data['customer_phone'],
                 'city' => $data['customer_city'],
                 'whatsAppEnable' => $request->has('whatsapp_enabled') ? 'yes' : 'no',
+                'customer_state' => $data['customer_state'] ?? 'Mr',
             ]);
             Log::info('Customer updated', ['customer' => $customer]);
         } else {
@@ -60,6 +61,7 @@ class ChecklistController extends Controller
                     'name' => $data['customer_name'],
                     'city' => $data['customer_city'],
                     'whatsAppEnable' => $request->has('whatsapp_enabled') ? 'yes' : 'no',
+                    'customer_state' => $data['customer_state'] ?? 'Mr',
                 ]
             );
             Log::info('Customer created or found', ['customer' => $customer]);
@@ -159,6 +161,20 @@ class ChecklistController extends Controller
 
         $checklist = \App\Models\CheckList::create($checklistData);
         Log::info('Checklist created', ['checklist' => $checklist]);
+        // Log activity
+        if (auth()->check()) {
+            $userName = auth()->user()->name;
+            $customerName = $repair->customer ? $repair->customer->name : 'Unknown Customer';
+            $deviceName = $repair->device ? $repair->device->name : 'Unknown Device';
+            $description = "$userName created $customerName's $deviceName checklist";
+            \App\Models\Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'created',
+                'subject_type' => \App\Models\CheckList::class,
+                'subject_id' => $checklist->id,
+                'description' => $description,
+            ]);
+        }
 
         return redirect('/')->with('success', 'Repair is saved!');
     }
@@ -225,6 +241,20 @@ class ChecklistController extends Controller
         }
 
         $checklist->update($checklistData);
+        // Log activity
+        if (auth()->check()) {
+            $userName = auth()->user()->name;
+            $customerName = $checklist->repair && $checklist->repair->customer ? $checklist->repair->customer->name : 'Unknown Customer';
+            $deviceName = $checklist->repair && $checklist->repair->device ? $checklist->repair->device->name : 'Unknown Device';
+            $description = "$userName updated $customerName's $deviceName checklist";
+            \App\Models\Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'updated',
+                'subject_type' => \App\Models\CheckList::class,
+                'subject_id' => $checklist->id,
+                'description' => $description,
+            ]);
+        }
 
         return redirect('/admin/repair/repairs')->with('success', 'Checklist updated successfully!');
     }
