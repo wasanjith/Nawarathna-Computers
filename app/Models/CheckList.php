@@ -38,6 +38,10 @@ class CheckList extends Model
         'dviCable',
         'backpanelnuts',
         'nutQty',
+        // Add the note fields below
+        'benchMark_note',
+        'stressTest_note',
+        'hardHealth_note',
     ];
 
     public function repair(): BelongsTo

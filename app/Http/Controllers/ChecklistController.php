@@ -138,56 +138,24 @@ class ChecklistController extends Controller
 
         $checklistData = [
             'repair_id' => $repair->id,
-            'nutQty' => $request->input('back_panel_nut_quantity', 0),
+            'nutQty' => $request->input('nutQty', 0),
             'backpanelnuts' => $request->input('backpanelnuts', 'yes'),
         ];
 
-        $allowedStatuses = [
-            // Fields that allow 'replaced'
-            'processor' => ['not_tested','working','replaced','removed','installed'],
-            'motherboard' => ['not_tested','working','replaced','removed','installed'],
-            'ram' => ['not_tested','working','replaced','removed','installed'],
-            'hard_disk_1' => ['not_tested','working','replaced','removed','installed'],
-            'hard_disk_2' => ['not_tested','working','replaced','removed','installed'],
-            'optical_drive' => ['not_tested','working','replaced','removed','installed'],
-            'network' => ['not_tested','working','replaced','removed','installed'],
-            'wifi' => ['not_tested','working','replaced','removed','installed'],
-            'camera' => ['not_tested','working','replaced','removed','installed'],
-            'hinges' => ['not_tested','working','replaced','removed','installed'],
-            'laptopSPK' => ['not_tested','working','replaced','removed','installed'],
-            'lapCamera' => ['not_tested','working','replaced','removed','installed'],
-            'mic' => ['not_tested','working','replaced','removed','installed'],
-            'touchPad' => ['not_tested','working','replaced','removed','installed'],
-            'keyboard' => ['not_tested','working','replaced','removed','installed'],
-            // Fields that do NOT allow 'replaced'
-            'frontUSB' => ['not_tested','working','not_working','removed','installed'],
-            'rearUSB' => ['not_tested','working','not_working','removed','installed'],
-            'frontSound' => ['not_tested','working','not_working','removed','installed'],
-            'rearSound' => ['not_tested','working','not_working','removed','installed'],
-            'vgaPort' => ['not_tested','working','not_working','removed','installed'],
-            'hdmiPort' => ['not_tested','working','not_working','removed','installed'],
-            'hardHealth' => ['not_tested','working','not_working','removed','installed'],
-            'stressTest' => ['not_tested','working','not_working','removed','installed'],
-            'benchMark' => ['not_tested','working','not_working','removed','installed'],
-            'powerCable_1' => ['not_tested','working','not_working','removed','installed'],
-            'powerCable_2' => ['not_tested','working','not_working','removed','installed'],
-            'vgaCable' => ['not_tested','working','not_working','removed','installed'],
-            'dviCable' => ['not_tested','working','not_working','removed','installed'],
-            'backpanelnuts' => ['yes','no'],
+        // List of all checklist fields
+        $fields = [
+            'processor','motherboard','ram','hard_disk_1','hard_disk_2','optical_drive','network','wifi','camera','hinges','laptopSPK','mic','touchPad','keyboard',
+            'frontUSB','rearUSB','frontSound','rearSound','vgaPort','hdmiPort','hardHealth','stressTest','benchMark','powerCable_1','powerCable_2','vgaCable','dviCable'
         ];
-
-        foreach ($request->input('checklist', []) as $item) {
-            if (isset($fieldMap[$item['component']])) {
-                $dbField = $fieldMap[$item['component']];
-                $status = $item['status'];
-                if (isset($allowedStatuses[$dbField]) && in_array($status, $allowedStatuses[$dbField])) {
-                    $checklistData[$dbField] = $status;
-                } else {
-                    // fallback to default if not allowed
-                    $checklistData[$dbField] = $allowedStatuses[$dbField][0] ?? 'not_tested';
-                }
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $checklistData[$field] = $request->input($field);
             }
         }
+        // Add notes fields
+        $checklistData['benchMark_note'] = $request->input('benchMark_note');
+        $checklistData['stressTest_note'] = $request->input('stressTest_note');
+        $checklistData['hardHealth_note'] = $request->input('hardHealth_note');
 
         $checklist = \App\Models\CheckList::create($checklistData);
         Log::info('Checklist created', ['checklist' => $checklist]);
@@ -245,6 +213,10 @@ class ChecklistController extends Controller
         $fields = [
             'processor','motherboard','ram','hard_disk_1','hard_disk_2','optical_drive','network','wifi','camera','hinges','laptopSPK','mic','touchPad','keyboard',
             'frontUSB','rearUSB','frontSound','rearSound','vgaPort','hdmiPort','hardHealth','stressTest','benchMark','powerCable_1','powerCable_2','vgaCable','dviCable',
+            'benchMark_note','stressTest_note','hardHealth_note',
+            'benchMark_extra1','benchMark_extra2','benchMark_extra3','benchMark_extra4',
+            'stressTest_extra1','stressTest_extra2','stressTest_extra3','stressTest_extra4',
+            'hardHealth_extra1','hardHealth_extra2','hardHealth_extra3','hardHealth_extra4',
         ];
         foreach ($fields as $field) {
             if ($request->has($field)) {

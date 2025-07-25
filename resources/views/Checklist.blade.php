@@ -133,11 +133,12 @@
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="removed" {{ old('network', $checklist->network ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="installed" {{ old('network', $checklist->network ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Hard Health</strong></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_tested" {{ old('hardHealth', $checklist->hardHealth ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="working" {{ old('hardHealth', $checklist->hardHealth ?? '') == 'working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_working" {{ old('hardHealth', $checklist->hardHealth ?? '') == 'not_working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="removed" {{ old('hardHealth', $checklist->hardHealth ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="installed" {{ old('hardHealth', $checklist->hardHealth ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
+                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                            <input type="radio" id="hardHealth_not_tested" name="hardHealth" value="not_tested" {{ old('hardHealth', $checklist->hardHealth ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0 hardHealth-radio">
+                        </td>
+                        <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                            <input type="text" id="hardHealth_note" name="hardHealth_note" value="{{ old('hardHealth_note', $checklist->hardHealth_note ?? '') }}" class="w-full px-2 py-1 border border-gray-300 rounded hardHealth-note" placeholder="Enter Hard Health details (if any)">
+                        </td>
                     </tr>
                     
                     <tr>
@@ -148,11 +149,12 @@
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="removed" {{ old('wifi', $checklist->wifi ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="installed" {{ old('wifi', $checklist->wifi ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Stress Test</strong></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_tested" {{ old('stressTest', $checklist->stressTest ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="working" {{ old('stressTest', $checklist->stressTest ?? '') == 'working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_working" {{ old('stressTest', $checklist->stressTest ?? '') == 'not_working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="removed" {{ old('stressTest', $checklist->stressTest ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="installed" {{ old('stressTest', $checklist->stressTest ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
+                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                            <input type="radio" id="stressTest_not_tested" name="stressTest" value="not_tested" {{ old('stressTest', $checklist->stressTest ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0 stressTest-radio">
+                        </td>
+                        <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                            <input type="text" id="stressTest_note" name="stressTest_note" value="{{ old('stressTest_note', $checklist->stressTest_note ?? '') }}" class="w-full px-2 py-1 border border-gray-300 rounded stressTest-note" placeholder="Enter Stress Test details (if any)">
+                        </td>
                     </tr>
                     
                     <tr>
@@ -163,11 +165,12 @@
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="removed" {{ old('camera', $checklist->camera ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="installed" {{ old('camera', $checklist->camera ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
                         <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Benchmark</strong></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_tested" {{ old('benchMark', $checklist->benchMark ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="working" {{ old('benchMark', $checklist->benchMark ?? '') == 'working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_working" {{ old('benchMark', $checklist->benchMark ?? '') == 'not_working' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="removed" {{ old('benchMark', $checklist->benchMark ?? '') == 'removed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
-                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="installed" {{ old('benchMark', $checklist->benchMark ?? '') == 'installed' ? 'checked' : '' }} class="w-4 h-4 m-0"></td>
+                        <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                            <input type="radio" id="benchMark_not_tested" name="benchMark" value="not_tested" {{ old('benchMark', $checklist->benchMark ?? 'not_tested') == 'not_tested' ? 'checked' : '' }} class="w-4 h-4 m-0 benchMark-radio">
+                        </td>
+                        <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                            <input type="text" id="benchMark_note" name="benchMark_note" value="{{ old('benchMark_note', $checklist->benchMark_note ?? '') }}" class="w-full px-2 py-1 border border-gray-300 rounded benchMark-note" placeholder="Enter Benchmark details (if any)">
+                        </td>
                     </tr>
                     
                     <tr>
@@ -276,3 +279,22 @@
     </div>
 </body>
 </html>
+<script>
+// For all three fields, typing in the input unchecks the radio, checking the radio clears the input
+['hardHealth', 'stressTest', 'benchMark'].forEach(function(field) {
+    const radio = document.getElementById(field + '_not_tested');
+    const note = document.getElementById(field + '_note');
+    if (radio && note) {
+        note.addEventListener('input', function() {
+            if (note.value.trim() !== '') {
+                radio.checked = false;
+            }
+        });
+        radio.addEventListener('change', function() {
+            if (radio.checked) {
+                note.value = '';
+            }
+        });
+    }
+});
+</script>

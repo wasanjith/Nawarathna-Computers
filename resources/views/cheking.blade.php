@@ -155,6 +155,11 @@
                                id="customer_phone" name="customer_phone" placeholder="Enter phone number" required>
                     </div>
                     <div>
+                        <label for="customer_phone2" class="block text-sm font-medium text-gray-700 mb-2">Phone 2</label>
+                        <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                               id="customer_phone2" name="customer_phone2" placeholder="Enter second phone number (optional)">
+                    </div>
+                    <div>
                         <label for="customer_city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
                         <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
                                id="customer_city" name="customer_city" placeholder="Enter city" required>
@@ -209,16 +214,18 @@
                 </div>
                 <div class="mt-6 flex flex-col md:flex-row md:space-x-6">
                     <div class="flex-1">
-                        <label for="device_id" class="block text-sm font-medium mb-2">Device ID</label>
+                        <label for="device_id" class="block text-sm font-medium mb-2">Serial Number</label>
                         <div class="relative">
                             @php
                                 $nextDeviceId = \DB::table('devices')->max('id') + 1;
+                                $nextDeviceIdPadded = str_pad($nextDeviceId, 4, '0', STR_PAD_LEFT);
                             @endphp
                             <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 shadow-md focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-50" 
                                    id="device_id" name="device_id" 
-                                   placeholder="Suggested: {{ $nextDeviceId }}">
+                                   placeholder="Suggested: {{ $nextDeviceIdPadded }}"
+                                   value="{{ $nextDeviceIdPadded }}">
                         </div>
-                        <div class="text-xs text-gray-500 mt-1">Suggested next device ID (you can change if needed)</div>
+                        <div class="text-xs text-gray-500 mt-1">Suggested next serial number (4 digits, e.g., 0014). You can change if needed.</div>
                     </div>
                     <div class="flex-1">
                         <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Slug</label>
@@ -436,11 +443,12 @@
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="removed" class="w-4 h-4 m-0"></td>
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="network" value="installed" class="w-4 h-4 m-0"></td>
                                 <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Hard Health</strong></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_tested" class="w-4 h-4 m-0" checked></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="not_working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="removed" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="hardHealth" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                                    <input type="radio" id="hardHealth_not_tested" name="hardHealth" value="not_tested" class="w-4 h-4 m-0 hardHealth-radio" checked>
+                                </td>
+                                <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                                    <input type="text" id="hardHealth_note" name="hardHealth_note" class="w-full px-2 py-1 border border-gray-300 rounded hardHealth-note" placeholder="Enter Hard Health details (if any)">
+                                </td>
                             </tr>
                             
                             <tr>
@@ -451,11 +459,12 @@
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="removed" class="w-4 h-4 m-0"></td>
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="wifi" value="installed" class="w-4 h-4 m-0"></td>
                                 <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Stress Test</strong></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_tested" class="w-4 h-4 m-0" checked></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="not_working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="removed" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="stressTest" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                                    <input type="radio" id="stressTest_not_tested" name="stressTest" value="not_tested" class="w-4 h-4 m-0 stressTest-radio" checked>
+                                </td>
+                                <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                                    <input type="text" id="stressTest_note" name="stressTest_note" class="w-full px-2 py-1 border border-gray-300 rounded stressTest-note" placeholder="Enter Stress Test details (if any)">
+                                </td>
                             </tr>
                             
                             <tr>
@@ -466,13 +475,16 @@
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="removed" class="w-4 h-4 m-0"></td>
                                 <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="camera" value="installed" class="w-4 h-4 m-0"></td>
                                 <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"><strong>Benchmark</strong></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_tested" class="w-4 h-4 m-0" checked></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="not_working" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="removed" class="w-4 h-4 m-0"></td>
-                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8"><input type="radio" name="benchMark" value="installed" class="w-4 h-4 m-0"></td>
+                                <td class="checkbox-cell border border-gray-300 p-2 text-center align-middle w-16 h-8">
+                                    <input type="radio" id="benchMark_not_tested" name="benchMark" value="not_tested" class="w-4 h-4 m-0 benchMark-radio" checked>
+                                </td>
+                                <td class="border border-gray-300 p-2 text-center align-middle" colspan="5">
+                                    <input type="text" id="benchMark_note" name="benchMark_note" class="w-full px-2 py-1 border border-gray-300 rounded benchMark-note" placeholder="Enter Benchmark details (if any)">
+                                </td>
                             </tr>
-                            
+                            <tr>
+                                <td colspan="12" class="bg-white h-6"></td>
+                            </tr>
                             <tr>
                                 <td class="border border-gray-300 p-2 text-left font-bold bg-gray-50 w-32 align-middle"></td>
                                 <td class="border border-gray-300 p-2 text-center align-middle"></td>
@@ -722,6 +734,7 @@
             
             // Auto-fill other customer fields
             document.getElementById('customer_phone').value = customer.phone;
+            document.getElementById('customer_phone2').value = customer.phone2; // Add this line
             document.getElementById('customer_city').value = customer.city;
             document.getElementById('whatsapp_enabled').checked = customer.whatsAppEnable === 'yes';
             
@@ -852,6 +865,24 @@
             setTimeout(function() {
                 loadNextRepairId();
             }, 1000);
+        });
+
+        // For all three fields, typing in the input unchecks the radio, checking the radio clears the input
+        ['hardHealth', 'stressTest', 'benchMark'].forEach(function(field) {
+            const radio = document.getElementById(field + '_not_tested');
+            const note = document.getElementById(field + '_note');
+            if (radio && note) {
+                note.addEventListener('input', function() {
+                    if (note.value.trim() !== '') {
+                        radio.checked = false;
+                    }
+                });
+                radio.addEventListener('change', function() {
+                    if (radio.checked) {
+                        note.value = '';
+                    }
+                });
+            }
         });
 
 
